@@ -1,29 +1,31 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db.models import Order
+from db.repositories import OrderRepository
 from db.session import get_db
-from schemas.res import DtoResOrders, DtoResOrder
+from schema.res import DtoResOrders, DtoResOrder
 
-router = APIRouter()
+router = APIRouter(prefix="/api/orders")
 
 
-@router.get("/orders/")
+@router.get("/")
 def get_orders_handler(
-        session: Session = Depends(get_db),
         sort_type: str = Query(
             "asc",
-            alias="sort-type"
-        )
+            alias="sort_type"
+        ),
+        session: Session = Depends(get_db)
 ) -> DtoResOrders:
-    orders: List[Order] = list(session.scalars(select(Order)))
-    if sort_type == "desc":
-        return DtoResOrders(
-            orders=[DtoResOrder.model_validate(order) for order in orders[::-1]]
-        )
+    order_repository = OrderRepository(session)
+    orders: List[Order] = order_repository.get_all(
+        sort_type == "desc"
+    )
     return DtoResOrders(
-        orders=[DtoResOrder.model_validate(order) for order in orders]
+        data=[
+            DtoResOrder.model_validate(order)
+            for order in orders
+        ]
     )

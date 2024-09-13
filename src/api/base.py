@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from schemas.res import DtoResHealth
+from schema.res import DtoResHealth
 
 router = APIRouter()
 

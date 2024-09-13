@@ -15,4 +15,15 @@ class DtoResOrder(BaseModel):
 
 
 class DtoResOrders(BaseModel):
-    orders: List[DtoResOrder]
+    data: List[DtoResOrder]
+
+
+class DtoResMember(BaseModel):
+    name: str
+
+    class Config:
+        from_attributes = True
+
+
+class DtoResMembers(BaseModel):
+    data: List[DtoResMember]
