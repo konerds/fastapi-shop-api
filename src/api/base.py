@@ -6,5 +6,5 @@ router = APIRouter()
 
 
 @router.get("/")
-def check_health() -> DtoResHealth:
+def check_health_handler() -> DtoResHealth:
     return DtoResHealth(status="OK")
