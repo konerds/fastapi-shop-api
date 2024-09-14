@@ -4,7 +4,8 @@
 
 | Variable Name | Description                                |
 |---------------|--------------------------------------------|
-| DB_URL        | Database Full Url (Default: SQLite Memory) |
+| ENV           | Server Environment (Default: dev)          |
+| DB_URL        | Database Full URL (Default: SQLite Memory) |
 
 ## API User Interface
 

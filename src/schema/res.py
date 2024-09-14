@@ -27,3 +27,17 @@ class DtoResMember(BaseModel):
 
 class DtoResMembers(BaseModel):
     data: List[DtoResMember]
+
+
+class DtoResProduct(BaseModel):
+    id: int
+    name: str
+    price: int
+    stock: int
+
+    class Config:
+        from_attributes = True
+
+
+class DtoResProducts(BaseModel):
+    data: List[DtoResProduct]

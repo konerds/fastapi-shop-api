@@ -1,29 +1,30 @@
-import os
-
-from dotenv import load_dotenv
 from sqlalchemy import create_engine, StaticPool
 from sqlalchemy.orm import sessionmaker
 
+from core.config import settings
 from db.models import Base
 
-load_dotenv()
-
-DB_URL = os.getenv("DB_URL", "sqlite:///")
-
-engine = create_engine(
-    DB_URL,
-    echo=True,
-    connect_args={
-        "check_same_thread": False
-    },
-    poolclass=StaticPool
-)
+if settings.ENV == "prod":
+    engine = create_engine(
+        settings.DB_URL
+    )
+else:
+    engine = create_engine(
+        settings.DB_URL,
+        echo=True,
+        connect_args={
+            "check_same_thread": False
+        },
+        poolclass=StaticPool
+    )
 
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
     bind=engine
 )
+
+Base.metadata.create_all(bind=engine)
 
 
 def get_db():
@@ -32,6 +33,3 @@ def get_db():
         yield session
     finally:
         session.close()
-
-
-Base.metadata.create_all(bind=engine)
