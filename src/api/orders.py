@@ -7,7 +7,7 @@ from db.models import Order, OrderedProduct
 from db.repositories import OrderRepository, MemberRepository, ProductRepository
 from db.session import get_db
 from schema.req import DtoReqPostOrder
-from schema.res import DtoResOrders, DtoResOrder
+from schema.res import DtoResOrders, DtoResOrder, DtoResOrderedProduct
 
 router = APIRouter(prefix="/api/orders")
 
@@ -49,11 +49,19 @@ def post_order_handler(
     product = product_repository.get_one(req.product_id)
     ordered_product = OrderedProduct.create(product, req.quantity)
     order_repository = OrderRepository(session)
-    return DtoResOrder.model_validate(
-        order_repository.save(
-            Order.create(
-                member=member,
-                ordered_products=[ordered_product]
-            )
+    order = order_repository.save(
+        Order.create(
+            member=member,
+            ordered_products=[ordered_product]
         )
+    )
+    return DtoResOrder(
+        id=order.id,
+        member_id=order.member_id,
+        products=[DtoResOrderedProduct(
+            id=product.id,
+            name=product.name,
+            price=product.price,
+            quantity=req.quantity
+        )]
     )

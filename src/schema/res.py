@@ -7,8 +7,17 @@ class DtoResHealth(BaseModel):
     status: str = "OK"
 
 
+class DtoResOrderedProduct(BaseModel):
+    id: int
+    name: str
+    price: int
+    quantity: int
+
+
 class DtoResOrder(BaseModel):
     id: int
+    member_id: int
+    products: List[DtoResOrderedProduct]
 
     class Config:
         from_attributes = True
@@ -19,7 +28,9 @@ class DtoResOrders(BaseModel):
 
 
 class DtoResMember(BaseModel):
+    id: int
     name: str
+    address: str
 
     class Config:
         from_attributes = True

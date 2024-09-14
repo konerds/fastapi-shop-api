@@ -90,9 +90,6 @@ class OrderedProduct(Base, MixinDefault):
             quantity=quantity
         )
 
-    def get_total_price(self):
-        return self.quantity * self.product.get_price()
-
 
 class Member(Base, MixinDefault):
     __tablename__ = "members"
