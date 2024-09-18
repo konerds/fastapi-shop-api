@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, StaticPool
 from sqlalchemy.orm import sessionmaker
 
 from db.models import Base
-from db.session import get_db
+from dependencies import get_db
 from main import app
 
 engine = create_engine(

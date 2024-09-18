@@ -94,11 +94,19 @@ class OrderedProduct(Base, MixinDefault):
 class Member(Base, MixinDefault):
     __tablename__ = "members"
 
-    name = Column(
+    email = Column(
+        String(256),
+        nullable=False,
+        unique=True,
+        index=True
+    )
+
+    password = Column(
         String(256),
         nullable=False
     )
-    address = Column(
+
+    name = Column(
         String(256),
         nullable=False
     )
@@ -112,10 +120,11 @@ class Member(Base, MixinDefault):
         return f"Member(id={self.id})"
 
     @classmethod
-    def create(cls, name: str, address: str):
+    def create(cls, email: str, password: str, name: str):
         return cls(
-            name=name,
-            address=address
+            email=email,
+            password=password,
+            name=name
         )
 
 
@@ -137,6 +146,17 @@ class Order(Base, MixinDefault):
         back_populates="order"
     )
 
+    delivery_id = Column(
+        Integer,
+        ForeignKey("deliveries.id")
+    )
+
+    delivery = relationship(
+        "Delivery",
+        back_populates="order",
+        uselist=False
+    )
+
     def __repr__(self):
         return f"Order(id={self.id})"
 
@@ -155,3 +175,18 @@ class Order(Base, MixinDefault):
         for ordered_product in ordered_products:
             order.add_ordered_product(ordered_product)
         return order
+
+
+class Delivery(Base, MixinDefault):
+    __tablename__ = "deliveries"
+
+    address = Column(
+        String(256),
+        nullable=False
+    )
+
+    order = relationship(
+        "Order",
+        back_populates="delivery",
+        uselist=False
+    )

@@ -2,8 +2,14 @@ from pydantic import BaseModel
 
 
 class DtoReqPostMember(BaseModel):
+    email: str
+    password: str
     name: str
-    address: str
+
+
+class DtoReqSigninMember(BaseModel):
+    email: str
+    password: str
 
 
 class DtoReqPostProduct(BaseModel):

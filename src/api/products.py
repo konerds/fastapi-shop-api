@@ -1,15 +1,17 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from db.models import Product
 from db.repositories import ProductRepository
-from db.session import get_db
+from dependencies import get_db
 from schema.req import DtoReqPostProduct
 from schema.res import DtoResProducts, DtoResProduct
 
 router = APIRouter(prefix="/api/products")
+templates = Jinja2Templates(directory="templates")
 
 
 @router.get(
@@ -40,16 +42,16 @@ def get_products_handler(
     response_model=DtoResProduct
 )
 def post_product_handler(
-        req: DtoReqPostProduct,
+        req_body: DtoReqPostProduct,
         session: Session = Depends(get_db),
 ):
     product_repository = ProductRepository(session)
     return DtoResProduct.model_validate(
         product_repository.save(
             Product.create(
-                req.name,
-                req.price,
-                req.stock
+                req_body.name,
+                req_body.price,
+                req_body.stock
             )
         )
     )

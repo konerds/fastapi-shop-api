@@ -1,11 +1,13 @@
 def test_post_order_handler(client):
     member1 = {
+        "email": "member1@konerds.buzz",
+        "password": "aaaaa11111",
         "name": "member1",
         "address": "address of member1"
     }
     response_members = client.post("/api/members/", json=member1)
     assert response_members.status_code == 200
-    data_members = response_members.json()
+    data_members = response_members.json()["data"]
     product1 = {
         "name": "product1",
         "price": 100,

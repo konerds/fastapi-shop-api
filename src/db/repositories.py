@@ -95,3 +95,9 @@ class MemberRepository:
             select(Member)
             .where(member_id == Member.id)
         )
+
+    def get_one_by_email(self, email):
+        return self.session.scalar(
+            select(Member)
+            .where(email == Member.email)
+        )

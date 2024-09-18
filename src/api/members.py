@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import Request, APIRouter, Depends, Query, HTTPException
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from db.models import Member
 from db.repositories import MemberRepository
-from db.session import get_db
-from schema.req import DtoReqPostMember
+from dependencies import get_db, encrypt, verify
+from schema.req import DtoReqPostMember, DtoReqSigninMember
 from schema.res import DtoResMembers, DtoResMember
 
 router = APIRouter(prefix="/api/members")
+templates = Jinja2Templates(directory="templates")
 
 
 @router.get(
@@ -34,19 +36,56 @@ def get_members_handler(
 
 
 @router.post(
-    "/",
-    response_model=DtoResMember
+    "/"
 )
 def post_member_handler(
-        req: DtoReqPostMember,
+        req_body: DtoReqPostMember,
         session: Session = Depends(get_db),
 ):
     member_repository = MemberRepository(session)
-    return DtoResMember.model_validate(
-        member_repository.save(
-            Member.create(
-                req.name,
-                req.address
-            )
+    member = member_repository.save(
+        Member.create(
+            req_body.email,
+            encrypt(req_body.password),
+            req_body.name
         )
     )
+    DtoResMember.model_validate(member)
+    return {
+        "message": "회원가입에 성공하였습니다!",
+        "data": member
+    }
+
+
+@router.post(
+    "/signin"
+)
+def signin_handler(
+        request: Request,
+        req_body: DtoReqSigninMember,
+        session: Session = Depends(get_db),
+):
+    member_repository = MemberRepository(session)
+    member = member_repository.get_one_by_email(req_body.email)
+    if member and verify(req_body.password, member.password):
+        request.session["member_id"] = member.id
+        return {
+            "message": "로그인에 성공하였습니다!"
+        }
+    else:
+        raise HTTPException(
+            status_code=401,
+            detail="로그인에 실패하였습니다..."
+        )
+
+
+@router.post(
+    "/signout"
+)
+def signout_handler(
+        request: Request
+):
+    request.session.pop("member_id", None)
+    return {
+        "message": "로그아웃에 성공하였습니다!"
+    }
