@@ -1,7 +1,7 @@
 from fastapi import status, APIRouter, Depends, Query, Request, HTTPException, Response
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from starlette.responses import RedirectResponse
 
 from db.models import Order, OrderedProduct
 from db.repositories import OrderRepository, MemberRepository, ProductRepository
@@ -32,8 +32,10 @@ def get_orders_handler(
     member = member_repository.get_one(member_id)
     if member is None:
         return RedirectResponse("/signin")
+    if member.is_admin is True:
+        return RedirectResponse("/")
     product_repository = ProductRepository(session)
-    products = product_repository.get_all()
+    products = product_repository.get_all(sort_type == "desc")
     order_repository = OrderRepository(session)
     orders = order_repository.get_all_by_member_id(
         member.id,
@@ -42,6 +44,8 @@ def get_orders_handler(
     return templates.TemplateResponse(
         "orders.html",
         {
+            "title_page": "Shop Service - Orders",
+            "title_header": "나의 주문 목록",
             "request": request,
             "products": products,
             "orders": orders
@@ -57,7 +61,7 @@ def get_orders_handler(
 def post_order_handler(
         request: Request,
         req_body: DtoReqPostOrder,
-        session: Session = Depends(get_db),
+        session: Session = Depends(get_db)
 ):
     member_id = request.session.get("member_id")
     if member_id is None:
@@ -103,9 +107,9 @@ def post_order_handler(
     status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_order_handler(
-        order_id: int,
         request: Request,
-        session: Session = Depends(get_db),
+        order_id: int,
+        session: Session = Depends(get_db)
 ):
     member_id = request.session.get("member_id")
     if member_id is None:

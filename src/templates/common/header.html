@@ -1,13 +1,14 @@
 <div class="header-bar">
     <div class="header-item">
-        <a href="#" class="btn btn-sm btn-danger username-button">
+        <a href="/static" class="btn btn-sm btn-danger username-button">
             <i class="fas fa-user"></i> {{ username }}
         </a>
     </div>
-    <h1>나의 주문 목록</h1>
+    <h1>{{ title_header }}</h1>
     <div class="header-item">
         <button onclick="signout()" class="btn btn-sm btn-danger logout-button">
-            <i class="fas fa-sign-out-alt"></i> 로그아웃
+            <i class="fas fa-sign-out-alt"></i>&nbsp;로그아웃
         </button>
     </div>
 </div>
+<script src="{{ url_for('static', path='/js/common/signout.js') }}"></script>

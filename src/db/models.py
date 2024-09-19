@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, FetchedValue
+from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, FetchedValue, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.sql import func
 
@@ -101,6 +101,12 @@ class OrderedProduct(Base, MixinDefault):
 class Member(Base, MixinDefault):
     __tablename__ = "members"
 
+    is_admin = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
+
     email = Column(
         String(256),
         nullable=False,
@@ -120,15 +126,17 @@ class Member(Base, MixinDefault):
 
     orders = relationship(
         "Order",
-        back_populates="member"
+        back_populates="member",
+        passive_deletes=True
     )
 
     def __repr__(self):
         return f"Member(id={self.id})"
 
     @classmethod
-    def create(cls, email: str, password: str, name: str):
+    def create(cls, is_admin: bool, email: str, password: str, name: str):
         return cls(
+            is_admin=is_admin,
             email=email,
             password=password,
             name=name
@@ -140,7 +148,10 @@ class Order(Base, MixinDefault):
 
     member_id = Column(
         Integer,
-        ForeignKey("members.id")
+        ForeignKey(
+            "members.id",
+            ondelete="CASCADE"
+        )
     )
 
     member = relationship(
@@ -154,15 +165,11 @@ class Order(Base, MixinDefault):
         passive_deletes=True
     )
 
-    delivery_id = Column(
-        Integer,
-        ForeignKey("deliveries.id")
-    )
-
     delivery = relationship(
         "Delivery",
         back_populates="order",
-        uselist=False
+        uselist=False,
+        passive_deletes=True
     )
 
     def __repr__(self):
@@ -195,6 +202,14 @@ class Delivery(Base, MixinDefault):
     address = Column(
         String(256),
         nullable=False
+    )
+
+    order_id = Column(
+        Integer,
+        ForeignKey(
+            "orders.id",
+            ondelete="CASCADE"
+        )
     )
 
     order = relationship(

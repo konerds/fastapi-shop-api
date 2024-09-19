@@ -9,6 +9,7 @@ def test_get_members_handler(client):
         member_repository = MemberRepository(session)
         member_repository.save(
             Member.create(
+                is_admin=False,
                 email="member1@konerds.buzz",
                 password="aaaaa11111",
                 name="member1"
@@ -16,6 +17,7 @@ def test_get_members_handler(client):
         )
         member_repository.save(
             Member.create(
+                is_admin=False,
                 email="member2@konerds.buzz",
                 password="aaaaa11111",
                 name="member2"
@@ -23,6 +25,7 @@ def test_get_members_handler(client):
         )
         member_repository.save(
             Member.create(
+                is_admin=False,
                 email="member3@konerds.buzz",
                 password="aaaaa11111",
                 name="member3"
@@ -48,7 +51,7 @@ def test_post_member_handler(client):
         "name": "member1"
     }
     response_post_members = client.post("/api/members", json=member1)
-    assert response_post_members.status_code == 200
+    assert response_post_members.status_code == 201
     data_post_members = response_post_members.json()
     assert data_post_members["message"] == "회원가입에 성공하였습니다!"
     saved_member = data_post_members["data"]

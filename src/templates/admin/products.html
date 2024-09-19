@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title_page }}</title>
+    {% include "common/external.html" %}
+    {% include "common/font.html" %}
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="{{ url_for('static', path='/css/admin/header.css') }}"
+    />
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="{{ url_for('static', path='/css/admin/products.css') }}"
+    />
+</head>
+<body>
+<div class="container">
+    {% include "admin/header.html" %}
+    <div class="card">
+        <div class="card-body">
+            <input
+                    type="text"
+                    id="new-product-name"
+                    placeholder="상품 이름"
+                    class="form-control product-name">
+            <input
+                    type="number"
+                    id="new-product-price"
+                    class="form-control product-price"
+                    placeholder="상품 가격(원)"
+                    min="0"
+            />
+            <input
+                    type="number"
+                    id="new-product-stock"
+                    class="form-control product-stock"
+                    placeholder="상품 재고(개)"
+                    min="0"
+            />
+            <button
+                    onclick="createProduct()"
+                    class="btn btn-primary btn-block"
+            >
+                상품 추가
+            </button>
+        </div>
+    </div>
+    {% for product in products %}
+        <div class="card order">
+            <div class="card-body">
+                <label for="name-{{ product.id }}">상품 이름</label>
+                <input
+                        type="text"
+                        id="name-{{ product.id }}"
+                        value="{{ product.name }}"
+                        class="form-control product-name"
+                        readonly
+                />
+                <label for="price-{{ product.id }}">상품 가격(원)</label>
+                <input
+                        type="number"
+                        id="price-{{ product.id }}"
+                        value="{{ product.price }}"
+                        class="form-control product-price"
+                        readonly
+                />
+                <label for="stock-{{ product.id }}">상품 재고(개)</label>
+                <input
+                        type="number"
+                        id="stock-{{ product.id }}"
+                        value="{{ product.stock }}"
+                        class="form-control product-stock"
+                        readonly
+                />
+                <div class="edit-buttons">
+                    <button
+                            onclick="toggleEdit({{ product.id }}, true)"
+                            class="btn btn-cancel"
+                    >
+                        <i class="fas fa-ban"></i>
+                        <span>취소</span>
+                    </button>
+                    <button
+                            onclick="toggleEdit({{ product.id }})"
+                            class="btn btn-edit"
+                    >
+                        <i class="fas fa-edit"></i>
+                        <span id="edit-button-text">수정</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<script src="{{ url_for('static', path='/js/admin/products.js') }}"></script>
+</body>
+</html>

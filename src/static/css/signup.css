@@ -1,0 +1,93 @@
+body {
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.container {
+    max-width: 400px;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 1rem;
+    width: 100%;
+}
+
+h1 {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin-bottom: 2rem;
+}
+
+p {
+    margin-bottom: 2rem;
+    color: #666;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.form-group label {
+    margin-bottom: .5rem;
+    color: #888;
+    text-align: left;
+    display: block;
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, .25);
+}
+
+.buttons button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.buttons button:hover {
+    background-color: #0056b3;
+}
+
+.buttons button.navigate {
+    background-color: darkgray;
+}
+
+.buttons button.navigate:hover {
+    opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 1.25rem;
+    }
+}

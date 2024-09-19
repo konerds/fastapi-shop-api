@@ -1,15 +1,40 @@
-.header-bar {
-    background-color: #FF8066;
+.header-bar,
+.navigator-bar {
     padding: 10px 0;
-    text-align: center;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
     animation: slideDown 0.5s ease-out;
     margin: 10px;
     position: relative;
     display: flex;
-    justify-content: center;
     align-items: center;
+}
+
+.header-bar {
+    justify-content: center;
+    background-color: #FF8066;
+    text-align: center;
+}
+
+.navigator-bar {
+    justify-content: start;
+    padding-left: 20px;
+    column-gap: 20px;
+    background-color: lightblue;
+    color: white;
+}
+
+.navigator-bar > a {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.navigator-bar > a.is-active {
+    color: black;
+}
+
+.navigator-bar > a:hover {
+    opacity: 0.7;
 }
 
 .header-item {
@@ -37,7 +62,8 @@
     margin-right: 5px;
 }
 
-.header-bar h1 {
+.header-bar h1,
+.navigator-bar > a {
     color: white;
     margin: 0;
     font-size: 1.3em;

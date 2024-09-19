@@ -50,16 +50,35 @@ class OrderRepository:
         return order
 
     def get_all(self, is_desc: bool = True):
-        return list(
-            self.session.scalars(
-                select(Order)
-                .order_by(
-                    Order.created_at.desc()
-                    if is_desc else
-                    Order.created_at
-                )
+        orders_raw = self.session.execute(
+            select(Order)
+            .options(
+                joinedload(Order.ordered_products)
+                .joinedload(OrderedProduct.product)
             )
-        )
+            .order_by(
+                Order.created_at.desc()
+                if is_desc else
+                Order.created_at
+            )
+        ).unique().scalars()
+        orders = []
+        for order in orders_raw:
+            order_data = {
+                "order_id": order.id,
+                "member_id": order.member_id,
+                "products": []
+            }
+            for ordered_product in order.ordered_products:
+                product = ordered_product.product
+                product_data = {
+                    "quantity": ordered_product.quantity,
+                    "name": product.name,
+                    "price": product.price
+                }
+                order_data["products"].append(product_data)
+            orders.append(order_data)
+        return orders
 
     def get_all_by_member_id(self, member_id, is_desc: bool = True):
         orders_raw = self.session.execute(

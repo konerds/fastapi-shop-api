@@ -41,7 +41,7 @@ def get_members_handler(
 )
 def post_member_handler(
         req_body: DtoReqPostMember,
-        session: Session = Depends(get_db),
+        session: Session = Depends(get_db)
 ):
     member_repository = MemberRepository(session)
     member = member_repository.get_one_by_email(req_body.email)
@@ -52,6 +52,7 @@ def post_member_handler(
         )
     member = member_repository.save(
         Member.create(
+            False,
             req_body.email,
             encrypt(req_body.password),
             req_body.name
@@ -71,7 +72,7 @@ def post_member_handler(
 def signin_handler(
         request: Request,
         req_body: DtoReqSigninMember,
-        session: Session = Depends(get_db),
+        session: Session = Depends(get_db)
 ):
     member_repository = MemberRepository(session)
     member = member_repository.get_one_by_email(req_body.email)
@@ -87,7 +88,7 @@ def signin_handler(
         )
 
 
-@router.get(
+@router.post(
     "/signout"
 )
 def signout_handler(

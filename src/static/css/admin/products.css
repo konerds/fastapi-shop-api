@@ -10,10 +10,6 @@
     background-color: #fff;
 }
 
-.card.order > h2 {
-    padding: 10px;
-}
-
 .card-body {
     position: relative;
     padding: 10px;
@@ -24,7 +20,6 @@
 }
 
 .order-quantity {
-    display: none;
     width: 100%;
     margin-bottom: 10px;
     border: 1px solid #ddd;
@@ -52,13 +47,25 @@
     transform: scale(1.1);
 }
 
-.edit-buttons .btn-delete {
-    background-color: #3498DB;
+.product-name,
+.product-price,
+.product-stock {
+    font-size: 1.1rem;
+}
+
+.edit-buttons .btn-edit,
+.edit-buttons .btn-cancel {
+    background-color: #E74C3C;
     color: #fff;
 }
 
-.edit-buttons .btn-delete:hover {
-    background-color: #2980B9;
+.edit-buttons .btn-edit:hover,
+.edit-buttons .btn-cancel:hover {
+    background-color: #C0392B;
+}
+
+.edit-buttons .btn-cancel {
+    display: none;
 }
 
 .btn-primary {

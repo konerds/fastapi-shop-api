@@ -2,11 +2,14 @@
 
 ## Environment Variables
 
-| Variable Name      | Description                                    |
-|--------------------|------------------------------------------------|
-| ENV                | Server Environment (Default: dev)              |
-| DB_URL             | Database Full URL (Default: SQLite Memory)     |
-| SESSION_SECRET_KEY | Session Secret Key (Default: abcdzxcv12349876) |
+| Variable Name      | Description                                                   |
+|--------------------|---------------------------------------------------------------|
+| ENV                | Server Environment (Default: dev)                             |
+| DB_URL             | Database Full URL (Default: SQLite Memory)                    |
+| SESSION_SECRET_KEY | Session Secret Key (Default: abcdzxcv12349876)                |
+| ADMIN_EMAIL        | Email address for admin account (Default: admin@konerds.buzz) |
+| ADMIN_PASSWORD     | Password for admin account (Default: aaaaa11111)              |
+| ADMIN_NAME         | Name for admin account (Default: admin)                       |
 
 ## API User Interface
 
