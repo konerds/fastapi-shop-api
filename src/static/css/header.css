@@ -1,0 +1,66 @@
+.header-bar {
+    background-color: #FF8066;
+    padding: 10px 0;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+    animation: slideDown 0.5s ease-out;
+    margin: 10px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-item {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.header-item:first-child {
+    left: 20px;
+}
+
+.header-item:last-child {
+    right: 20px;
+}
+
+.username-button, .logout-button {
+    display: flex;
+    align-items: center;
+}
+
+.username-button i, .logout-button i {
+    margin-right: 5px;
+}
+
+.header-bar h1 {
+    color: white;
+    margin: 0;
+    font-size: 1.3em;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+
+.logout-button {
+    margin-left: 10px;
+}
+
+.btn-sm {
+    padding: 0.15rem 0.5rem;
+    font-size: .8rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

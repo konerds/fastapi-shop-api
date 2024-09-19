@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Shop Service - Sign In</title>
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/css/auth.css') }}"/>
+    <script>
+        function submitSigninForm(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            fetch('/api/members/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json().then(body => ({status: response.status, body: body})))
+                .then(result => {
+                    if (result.status === 200) {
+                        alert(result.body.message);
+                        location.href = '/orders';
+                    } else {
+                        throw new Error(result.body.detail || '로그인을 실패했습니다.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert(error.message);
+                });
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Shop Service with FastAPI</h1>
+    <p>FastAPI 프레임워크를 익혀보기 위한 실습용 서비스</p>
+    <form id="signinForm" onsubmit="submitSigninForm(event)">
+        <div class="form-group">
+            <label for="email">이메일:</label>
+            <input type="text" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">비밀번호:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="buttons">
+            <button type="submit">로그인</button>
+        </div>
+    </form>
+    <div class="buttons">
+        <button type="button" class="navigate" onclick="location.href='/signup'">회원가입</button>
+    </div>
+</div>
+</body>
+</html>

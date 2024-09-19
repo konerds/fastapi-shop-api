@@ -19,6 +19,5 @@ class DtoReqPostProduct(BaseModel):
 
 
 class DtoReqPostOrder(BaseModel):
-    member_id: int
     product_id: int
     quantity: int

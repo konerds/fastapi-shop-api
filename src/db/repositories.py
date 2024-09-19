@@ -55,6 +55,19 @@ class OrderRepository:
             )
         )
 
+    def get_all_by_member_id(self, member_id, is_desc: bool = True):
+        return list(
+            self.session.scalars(
+                select(Order)
+                .where(member_id == Order.member_id)
+                .order_by(
+                    Order.created_at.desc()
+                    if is_desc else
+                    Order.created_at
+                )
+            )
+        )
+
     def get_one(self, order_id):
         return self.session.scalar(
             select(Order)

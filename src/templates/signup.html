@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Shop Service - Sign Up</title>
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/css/auth.css') }}"/>
+    <script>
+        function submitSignupForm(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {
+                email: formData.get('email'),
+                password: formData.get('password'),
+                name: formData.get('name')
+            };
+            fetch('/api/members', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json().then(body => ({status: response.status, body: body})))
+                .then(result => {
+                    if (result.status === 200) {
+                        alert(result.body.message);
+                        location.href = '/signin';
+                    } else {
+                        throw new Error(result.body.detail || '회원가입을 실패했습니다.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert(error.message);
+                });
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Shop Service with FastAPI</h1>
+    <p>FastAPI 프레임워크를 익혀보기 위한 실습용 서비스</p>
+    <form id="signupForm" onsubmit="submitSignupForm(event)">
+        <div class="form-group">
+            <label for="signup_email">이메일:</label>
+            <input type="email" id="signup_email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="signup_password">비밀번호:</label>
+            <input type="password" id="signup_password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="signup_name">이름:</label>
+            <input type="text" id="signup_name" name="name" required>
+        </div>
+        <div class="buttons">
+            <button type="submit">회원가입</button>
+        </div>
+    </form>
+    <div class="buttons">
+        <button type="button" class="navigate" onclick="location.href='/signin'">로그인</button>
+    </div>
+</div>
+</body>
+</html>

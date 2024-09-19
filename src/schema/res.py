@@ -16,7 +16,6 @@ class DtoResOrderedProduct(BaseModel):
 
 class DtoResOrder(BaseModel):
     id: int
-    member_id: int
     products: List[DtoResOrderedProduct]
 
     class Config:

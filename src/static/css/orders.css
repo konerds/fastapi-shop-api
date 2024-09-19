@@ -1,0 +1,78 @@
+.container {
+    margin-top: 20px;
+    max-width: 800px;
+}
+
+.card {
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .1);
+    background-color: #fff;
+}
+
+.card-body {
+    position: relative;
+    padding: 10px;
+}
+
+.order-title, .order-content {
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    padding: 10px;
+}
+
+.order-title {
+    font-size: 1.1rem;
+}
+
+.order-content {
+    min-height: 100px;
+}
+
+.edit-buttons {
+    margin: 10px;
+    text-align: right;
+    margin-right: 0px;
+    margin-bottom: 0px;
+}
+
+.edit-buttons .btn {
+    background-color: #f8f9fa;
+    border: none;
+    border-radius: 5px;
+    margin-left: 5px;
+    padding: 5px 10px;
+    color: #495057;
+    transition: all 0.3s ease;
+}
+
+.edit-buttons .btn:hover {
+    background-color: #e2e6ea;
+    transform: scale(1.1);
+}
+
+.edit-buttons .btn-delete {
+    background-color: #3498DB;
+    color: #fff;
+}
+
+.edit-buttons .btn-delete:hover {
+    background-color: #2980B9;
+}
+
+.btn-primary {
+    background-color: #3F464D;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
