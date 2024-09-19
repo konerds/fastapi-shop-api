@@ -4,6 +4,7 @@
 
 | Variable Name      | Description                                                   |
 |--------------------|---------------------------------------------------------------|
+| PORT               | Server Listening Port (Default: 5000)                         |
 | ENV                | Server Environment (Default: dev)                             |
 | DB_URL             | Database Full URL (Default: SQLite Memory)                    |
 | SESSION_SECRET_KEY | Session Secret Key (Default: abcdzxcv12349876)                |

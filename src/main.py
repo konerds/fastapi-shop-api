@@ -51,4 +51,7 @@ async def not_found_page_handler(request: Request, exception: HTTPException):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True)
+    if settings.ENV == "prod":
+        uvicorn.run("main:app", port=settings.PORT, reload=True)
+    else:
+        uvicorn.run("main:app", port=settings.PORT, log_level="info")
