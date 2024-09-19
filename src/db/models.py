@@ -71,7 +71,10 @@ class OrderedProduct(Base, MixinDefault):
     )
     order_id = Column(
         Integer,
-        ForeignKey("orders.id")
+        ForeignKey(
+            "orders.id",
+            ondelete="CASCADE"
+        )
     )
 
     product = relationship(
@@ -82,8 +85,12 @@ class OrderedProduct(Base, MixinDefault):
         back_populates="ordered_products"
     )
 
+    def cancel(self):
+        self.product.increase_stock(self.quantity)
+
     @classmethod
     def create(cls, product: Product, quantity: int):
+        product.decrease_stock(quantity)
         return cls(
             product_id=product.id,
             product=product,
@@ -143,7 +150,8 @@ class Order(Base, MixinDefault):
 
     ordered_products = relationship(
         "OrderedProduct",
-        back_populates="order"
+        back_populates="order",
+        passive_deletes=True
     )
 
     delivery_id = Column(
@@ -164,6 +172,10 @@ class Order(Base, MixinDefault):
         ordered_product.order = self
         ordered_product.order_id = self.id
         self.ordered_products.append(ordered_product)
+
+    def cancel(self):
+        for ordered_product in self.ordered_products:
+            ordered_product.cancel()
 
     @classmethod
     def create(cls, member: Member, ordered_products: list[OrderedProduct]):

@@ -24,7 +24,7 @@
             })
                 .then(response => response.json().then(body => ({status: response.status, body: body})))
                 .then(result => {
-                    if (result.status === 200) {
+                    if (result.status === 201) {
                         alert(result.body.message);
                         location.href = '/orders';
                     } else {

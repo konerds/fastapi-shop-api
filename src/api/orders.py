@@ -1,8 +1,7 @@
-from typing import List
-
-from fastapi import APIRouter, Depends, Query, Request, HTTPException
+from fastapi import status, APIRouter, Depends, Query, Request, HTTPException, Response
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from starlette.responses import RedirectResponse
 
 from db.models import Order, OrderedProduct
 from db.repositories import OrderRepository, MemberRepository, ProductRepository
@@ -28,19 +27,15 @@ def get_orders_handler(
 ):
     member_id = request.session.get("member_id")
     if member_id is None:
-        raise HTTPException(
-            status_code=401,
-            detail="인가되지 않은 요청입니다..."
-        )
+        return RedirectResponse("/signin")
     member_repository = MemberRepository(session)
     member = member_repository.get_one(member_id)
     if member is None:
-        raise HTTPException(
-            status_code=404,
-            detail="존재하지 않는 회원입니다..."
-        )
+        return RedirectResponse("/signin")
+    product_repository = ProductRepository(session)
+    products = product_repository.get_all()
     order_repository = OrderRepository(session)
-    orders: List[Order] = order_repository.get_all_by_member_id(
+    orders = order_repository.get_all_by_member_id(
         member.id,
         sort_type == "desc"
     )
@@ -48,6 +43,7 @@ def get_orders_handler(
         "orders.html",
         {
             "request": request,
+            "products": products,
             "orders": orders
         }
     )
@@ -55,6 +51,7 @@ def get_orders_handler(
 
 @router.post(
     "/api/orders",
+    status_code=status.HTTP_201_CREATED,
     response_model=DtoResOrder
 )
 def post_order_handler(
@@ -77,6 +74,11 @@ def post_order_handler(
         )
     product_repository = ProductRepository(session)
     product = product_repository.get_one(req_body.product_id)
+    if req_body.quantity > product.stock:
+        raise HTTPException(
+            status_code=400,
+            detail="재고가 없습니다..."
+        )
     ordered_product = OrderedProduct.create(product, req_body.quantity)
     order_repository = OrderRepository(session)
     order = order_repository.save(
@@ -97,7 +99,8 @@ def post_order_handler(
 
 
 @router.delete(
-    "/api/orders/{order_id}"
+    "/api/orders/{order_id}",
+    status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_order_handler(
         order_id: int,
@@ -118,4 +121,8 @@ def delete_order_handler(
             detail="존재하지 않는 회원입니다..."
         )
     order_repository = OrderRepository(session)
+    order = order_repository.get_one(order_id)
+    order.cancel()
     order_repository.delete_one(order_id)
+    session.commit()
+    return Response()

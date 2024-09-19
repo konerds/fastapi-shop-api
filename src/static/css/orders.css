@@ -15,20 +15,12 @@
     padding: 10px;
 }
 
-.order-title, .order-content {
+.order-quantity {
     width: 100%;
     margin-bottom: 10px;
     border: 1px solid #ddd;
     background-color: #fff;
     padding: 10px;
-}
-
-.order-title {
-    font-size: 1.1rem;
-}
-
-.order-content {
-    min-height: 100px;
 }
 
 .edit-buttons {

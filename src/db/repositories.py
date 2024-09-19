@@ -1,7 +1,7 @@
 from sqlalchemy import select, delete
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
-from db.models import Order, Member, Product
+from db.models import Order, Member, Product, OrderedProduct
 
 
 class ProductRepository:
@@ -32,6 +32,12 @@ class ProductRepository:
             .where(product_id == Product.id)
         )
 
+    def get_one_by_name(self, name):
+        return self.session.scalar(
+            select(Product)
+            .where(name == Product.name)
+        )
+
 
 class OrderRepository:
     def __init__(self, session: Session):
@@ -56,17 +62,35 @@ class OrderRepository:
         )
 
     def get_all_by_member_id(self, member_id, is_desc: bool = True):
-        return list(
-            self.session.scalars(
-                select(Order)
-                .where(member_id == Order.member_id)
-                .order_by(
-                    Order.created_at.desc()
-                    if is_desc else
-                    Order.created_at
-                )
+        orders_raw = self.session.execute(
+            select(Order)
+            .where(member_id == Order.member_id)
+            .options(
+                joinedload(Order.ordered_products)
+                .joinedload(OrderedProduct.product)
             )
-        )
+            .order_by(
+                Order.created_at.desc()
+                if is_desc else
+                Order.created_at
+            )
+        ).unique().scalars()
+        orders = []
+        for order in orders_raw:
+            order_data = {
+                "order_id": order.id,
+                "products": []
+            }
+            for ordered_product in order.ordered_products:
+                product = ordered_product.product
+                product_data = {
+                    "quantity": ordered_product.quantity,
+                    "name": product.name,
+                    "price": product.price
+                }
+                order_data["products"].append(product_data)
+            orders.append(order_data)
+        return orders
 
     def get_one(self, order_id):
         return self.session.scalar(

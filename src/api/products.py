@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import status, APIRouter, Depends, Query, HTTPException
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
@@ -39,6 +39,7 @@ def get_products_handler(
 
 @router.post(
     "/",
+    status_code=status.HTTP_201_CREATED,
     response_model=DtoResProduct
 )
 def post_product_handler(
@@ -46,6 +47,12 @@ def post_product_handler(
         session: Session = Depends(get_db),
 ):
     product_repository = ProductRepository(session)
+    product = product_repository.get_one_by_name(req_body.name)
+    if product is not None:
+        raise HTTPException(
+            status_code=400,
+            detail="이미 존재하는 제품입니다..."
+        )
     return DtoResProduct.model_validate(
         product_repository.save(
             Product.create(

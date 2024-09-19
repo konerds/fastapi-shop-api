@@ -1,5 +1,7 @@
 from passlib.context import CryptContext
+from sqlalchemy import text
 
+from core.config import settings
 from db.session import SessionLocal
 
 crypt_context = CryptContext(
@@ -19,6 +21,8 @@ def verify(plain, encrypted):
 def get_db():
     session = SessionLocal()
     try:
+        if settings.ENV == "dev":
+            session.execute(text("PRAGMA foreign_keys=ON;"))
         yield session
     finally:
         session.close()

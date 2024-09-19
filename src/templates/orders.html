@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Shop Service - Orders</title>
+    <title>Orders</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css"
@@ -10,7 +10,61 @@
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', path='/css/orders.css') }}"/>
     <script>
+        function handlerOnChangeOptions(e) {
+            var elSelectProducts = e.target;
+            var selectedIdx = elSelectProducts.selectedIndex;
+            if (!selectedIdx) {
+                return;
+            }
+            var pdt = elSelectProducts.options[selectedIdx];
+            var price = pdt.getAttribute("data-price");
+            if (!price) {
+                return;
+            }
+            var stock = pdt.getAttribute("data-stock");
+            if (!stock) {
+                return;
+            }
+            var elInputQuantity = document.getElementById("quantity");
+            elInputQuantity.setAttribute("max", stock);
+            elInputQuantity.setAttribute("value", 1)
+            document.getElementById("total-price").innerText = `총 주문 가격: ${price}원`;
+        }
+
+        function handlerOnChangeQuantity(e) {
+            var elSelectProducts = document.getElementById("options-product");
+            var selectedIdx = elSelectProducts.selectedIndex;
+            if (!selectedIdx) {
+                return;
+            }
+            var price = elSelectProducts.options[selectedIdx].getAttribute("data-price");
+            if (!price) {
+                return;
+            }
+            var quantity = +e.target.value;
+            if (!quantity) {
+                quantity = 1;
+            } else {
+                var max = +e.target.max;
+                if (quantity > max) {
+                    quantity = max;
+                }
+            }
+            document.getElementById("quantity").value = quantity;
+            document.getElementById("total-price").innerText = `총 주문 가격: ${price * quantity}원`;
+        }
+
         function createOrder() {
+            var productId = document.getElementById("options-product").value;
+            var quantity = document.getElementById('quantity').value;
+            if (!productId || !quantity) {
+                alert("주문하실 상품을 선택해주세요.");
+                return;
+            }
+            if (!quantity) {
+                alert("주문 수량을 입력해주세요.");
+                return;
+            }
             fetch('/api/orders', {
                 method: 'POST',
                 headers: {
@@ -18,49 +72,44 @@
                 },
                 body: JSON.stringify(
                     {
-                        product_id: 1,
-                        quantity: 1
+                        product_id: productId,
+                        quantity: quantity
                     }
                 )
             })
                 .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    window.location.reload();
+                .then(_ => {
+                    location.reload();
                 })
                 .catch((error) => {
                     console.error('Error:', error);
                 });
         }
 
-        function cancelOrder(id) {
+        function cancelOrder(orderId) {
             if (!confirm('주문을 취소하시겠습니까?')) {
                 return;
             }
-            fetch('/api/orders/' + id, {
+            fetch('/api/orders/' + orderId, {
                 method: 'DELETE',
             })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    window.location.reload();
-                })
                 .catch((error) => {
                     console.error('Error:', error);
-                });
+                }).finally(() => {
+                location.reload();
+            });
         }
 
         function signout() {
             fetch('/api/members/signout', {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
                 .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    window.location.href = '/';
+                .then(_ => {
+                    location.href = '/';
                 })
                 .catch((error) => {
                     console.error('Error:', error);
@@ -71,6 +120,75 @@
 <body>
 <div class="container">
     {% include "header.html" %}
+    <div class="card">
+        <div class="card-body">
+            <select id="options-product" class="form-control" onchange="handlerOnChangeOptions(event)">
+                <option value="" data-price="0">상품을 선택해주세요.</option>
+                {% for product in products %}
+                    {% if product.stock > 0 %}
+                        <option
+                                value="{{ product.id }}"
+                                data-price="{{ product.price }}"
+                                data-stock="{{ product.stock }}"
+                        >
+                            {{ product.name }} (재고: {{ product.stock }})
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <input
+                    type="number"
+                    id="quantity"
+                    class="form-control order-quantity"
+                    placeholder="주문 수량"
+                    min="1"
+                    onchange="handlerOnChangeQuantity(event)"
+            />
+            <p id="total-price" class="mt-3"></p>
+            <button onclick="createOrder()" class="btn btn-primary btn-block">주문하기</button>
+        </div>
+    </div>
+    {% for order in orders %}
+        <div class="card order">
+            <div class="card-body">
+                {% for product in order.products %}
+                    <input
+                            type="text"
+                            id="name-{{ product.id }}"
+                            class="form-control"
+                            value="상품명: {{ product.name }}"
+                            readonly
+                    />
+                    <input
+                            type="text"
+                            id="unit-price-{{ product.id }}"
+                            class="form-control"
+                            value="상품 가격: {{ product.price }}"
+                            readonly
+                    />
+                    <input
+                            type="text"
+                            id="quantity-{{ product.id }}"
+                            class="form-control"
+                            value="주문 수량: {{ product.quantity }}"
+                            readonly
+                    />
+                    <hr/>
+                    <input
+                            type="text"
+                            id="total-price-{{ product.id }}"
+                            class="form-control"
+                            value="총 주문 금액: {{ product.price * product.quantity }}"
+                            readonly
+                    />
+                {% endfor %}
+                <div class="edit-buttons">
+                    <button onclick="cancelOrder({{ order.order_id }})" class="btn btn-delete"><i
+                            class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 </div>
 </body>
 </html>

@@ -1,4 +1,4 @@
-from fastapi import Request, APIRouter, Depends, Query, HTTPException
+from fastapi import status, Request, APIRouter, Depends, Query, HTTPException
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
@@ -36,13 +36,20 @@ def get_members_handler(
 
 
 @router.post(
-    "/"
+    "/",
+    status_code=status.HTTP_201_CREATED
 )
 def post_member_handler(
         req_body: DtoReqPostMember,
         session: Session = Depends(get_db),
 ):
     member_repository = MemberRepository(session)
+    member = member_repository.get_one_by_email(req_body.email)
+    if member is not None:
+        raise HTTPException(
+            status_code=400,
+            detail="이미 존재하는 이메일입니다..."
+        )
     member = member_repository.save(
         Member.create(
             req_body.email,
@@ -58,7 +65,8 @@ def post_member_handler(
 
 
 @router.post(
-    "/signin"
+    "/signin",
+    status_code=status.HTTP_201_CREATED
 )
 def signin_handler(
         request: Request,
@@ -79,7 +87,7 @@ def signin_handler(
         )
 
 
-@router.post(
+@router.get(
     "/signout"
 )
 def signout_handler(
