@@ -5,12 +5,12 @@ from sqlalchemy.orm import Session
 
 from db.models import Order, OrderedProduct
 from db.repositories import OrderRepository, MemberRepository, ProductRepository
-from dependencies import get_db
+from dependencies import get_db, TEMPLATE_DIR
 from schema.req import DtoReqPostOrder
 from schema.res import DtoResOrders, DtoResOrder, DtoResOrderedProduct
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=TEMPLATE_DIR)
 
 
 @router.get(
