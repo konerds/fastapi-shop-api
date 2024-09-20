@@ -1,3 +1,5 @@
+from enum import Enum
+
 from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, FetchedValue, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.sql import func
@@ -143,6 +145,57 @@ class Member(Base, MixinDefault):
         )
 
 
+class OrderStatus(Enum):
+    PROCEEDING = "proceeding"
+    COMPLETED = "completed"
+    CANCELED = "canceled"
+
+
+class DeliveryStatus(Enum):
+    PROCEEDING = "proceeding"
+    COMPLETED = "completed"
+    CANCELED = "canceled"
+    PENDING = "pending"
+
+
+class Delivery(Base, MixinDefault):
+    __tablename__ = "deliveries"
+
+    address = Column(
+        String(256),
+        nullable=False
+    )
+
+    status = Column(
+        String(256),
+        nullable=False,
+        default=DeliveryStatus.PENDING.value
+    )
+
+    order_id = Column(
+        Integer,
+        ForeignKey(
+            "orders.id",
+            ondelete="CASCADE"
+        )
+    )
+
+    order = relationship(
+        "Order",
+        back_populates="delivery",
+        uselist=False
+    )
+
+    def get_status(self):
+        return DeliveryStatus(self.status)
+
+    def set_status(self, status: DeliveryStatus):
+        self.status = status.value
+
+    def set_address(self, address: str):
+        self.address = address
+
+
 class Order(Base, MixinDefault):
     __tablename__ = "orders"
 
@@ -152,6 +205,12 @@ class Order(Base, MixinDefault):
             "members.id",
             ondelete="CASCADE"
         )
+    )
+
+    status = Column(
+        String(256),
+        nullable=False,
+        default=OrderStatus.PROCEEDING.value
     )
 
     member = relationship(
@@ -180,40 +239,25 @@ class Order(Base, MixinDefault):
         ordered_product.order_id = self.id
         self.ordered_products.append(ordered_product)
 
+    def get_status(self):
+        return OrderStatus(self.status)
+
+    def set_status(self, status: OrderStatus):
+        self.status = status.value
+
     def cancel(self):
         for ordered_product in self.ordered_products:
             ordered_product.cancel()
+        self.set_status(OrderStatus.CANCELED)
 
     @classmethod
-    def create(cls, member: Member, ordered_products: list[OrderedProduct]):
+    def create(cls, member: Member, ordered_products: list[OrderedProduct], address: str):
         order = cls(
             member_id=member.id,
             member=member,
             ordered_products=ordered_products
         )
+        order.delivery = Delivery(address=address)
         for ordered_product in ordered_products:
             order.add_ordered_product(ordered_product)
         return order
-
-
-class Delivery(Base, MixinDefault):
-    __tablename__ = "deliveries"
-
-    address = Column(
-        String(256),
-        nullable=False
-    )
-
-    order_id = Column(
-        Integer,
-        ForeignKey(
-            "orders.id",
-            ondelete="CASCADE"
-        )
-    )
-
-    order = relationship(
-        "Order",
-        back_populates="delivery",
-        uselist=False
-    )

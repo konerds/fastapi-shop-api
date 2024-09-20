@@ -3,12 +3,14 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
+from core.config import settings
 from db.repositories import MemberRepository
 from dependencies import get_db, TEMPLATE_DIR
 from schema.res import DtoResHealth
 
 router = APIRouter()
 templates = Jinja2Templates(directory=TEMPLATE_DIR)
+templates.env.globals['env'] = settings.ENV
 
 
 @router.get("/")
@@ -22,6 +24,7 @@ def get_root_page_handler(
     member_repository = MemberRepository(session)
     member = member_repository.get_one(member_id)
     if member is None:
+        request.session.pop("member_id", None)
         return RedirectResponse("/signin")
     if member.is_admin is True:
         return RedirectResponse("/admin/products")

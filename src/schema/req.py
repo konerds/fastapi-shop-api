@@ -21,3 +21,12 @@ class DtoReqPostProduct(BaseModel):
 class DtoReqPostOrder(BaseModel):
     product_id: int
     quantity: int
+    address: str
+
+
+class DtoReqPutOrderStatus(BaseModel):
+    status: str
+
+
+class DtoReqPutDeliveryStatus(BaseModel):
+    status: str

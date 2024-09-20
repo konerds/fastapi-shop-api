@@ -3,14 +3,16 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from db.models import Product
+from core.config import settings
+from db.models import Product, OrderStatus, DeliveryStatus
 from db.repositories import MemberRepository, ProductRepository, OrderRepository
 from dependencies import get_db, TEMPLATE_DIR
-from schema.req import DtoReqPostProduct
+from schema.req import DtoReqPostProduct, DtoReqPutOrderStatus, DtoReqPutDeliveryStatus
 from schema.res import DtoResProduct
 
 router = APIRouter()
 templates = Jinja2Templates(directory=TEMPLATE_DIR)
+templates.env.globals['env'] = settings.ENV
 
 
 @router.get(
@@ -37,6 +39,7 @@ def get_admin_products_page_handler(
     member_repository = MemberRepository(session)
     member = member_repository.get_one(member_id)
     if member is None:
+        request.session.pop("member_id", None)
         return RedirectResponse("/signin")
     if member.is_admin is False:
         return RedirectResponse("/")
@@ -71,6 +74,7 @@ def get_admin_orders_page_handler(
     member_repository = MemberRepository(session)
     member = member_repository.get_one(member_id)
     if member is None:
+        request.session.pop("member_id", None)
         return RedirectResponse("/signin")
     if member.is_admin is False:
         return RedirectResponse("/")
@@ -136,10 +140,9 @@ def post_product_handler(
 
 @router.put(
     "/api/admin/products/{product_id}",
-    status_code=status.HTTP_201_CREATED,
     response_model=DtoResProduct
 )
-def post_product_handler(
+def put_product_handler(
         request: Request,
         product_id: int,
         req_body: DtoReqPostProduct,
@@ -183,3 +186,72 @@ def post_product_handler(
             product
         )
     )
+
+
+@router.put(
+    "/api/admin/orders/{order_id}",
+)
+def put_order_status_handler(
+        request: Request,
+        order_id: int,
+        req_body: DtoReqPutOrderStatus,
+        session: Session = Depends(get_db)
+):
+    member_id = request.session.get("member_id")
+    if member_id is None:
+        raise HTTPException(
+            status_code=401,
+            detail="인가되지 않은 요청입니다..."
+        )
+    member_repository = MemberRepository(session)
+    member = member_repository.get_one(member_id)
+    if member is None:
+        raise HTTPException(
+            status_code=404,
+            detail="존재하지 않는 회원입니다..."
+        )
+    order_repository = OrderRepository(session)
+    order = order_repository.get_one(order_id)
+    status = OrderStatus(req_body.status)
+    order.set_status(status)
+    if status == OrderStatus.CANCELED:
+        order.delivery.set_status(DeliveryStatus.CANCELED)
+    order = order_repository.save(order)
+    return {
+        "id": order.id,
+        "order_status": order.get_status().value,
+        "delivery_status": order.delivery.get_status().value
+    }
+
+
+@router.put(
+    "/api/admin/orders/{order_id}/delivery",
+)
+def put_order_delivery_status_handler(
+        request: Request,
+        order_id: int,
+        req_body: DtoReqPutDeliveryStatus,
+        session: Session = Depends(get_db)
+):
+    member_id = request.session.get("member_id")
+    if member_id is None:
+        raise HTTPException(
+            status_code=401,
+            detail="인가되지 않은 요청입니다..."
+        )
+    member_repository = MemberRepository(session)
+    member = member_repository.get_one(member_id)
+    if member is None:
+        raise HTTPException(
+            status_code=404,
+            detail="존재하지 않는 회원입니다..."
+        )
+    order_repository = OrderRepository(session)
+    order = order_repository.get_one(order_id)
+    order.delivery.set_status(DeliveryStatus(req_body.status))
+    order = order_repository.save(order)
+    return {
+        "id": order.id,
+        "order_status": order.get_status().value,
+        "delivery_status": order.delivery.get_status().value
+    }

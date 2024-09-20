@@ -2,6 +2,7 @@ from sqlalchemy import select, delete
 from sqlalchemy.orm import Session, joinedload
 
 from db.models import Order, Member, Product, OrderedProduct
+from dependencies import convert_order_status, convert_delivery_status
 
 
 class ProductRepository:
@@ -53,6 +54,7 @@ class OrderRepository:
         orders_raw = self.session.execute(
             select(Order)
             .options(
+                joinedload(Order.delivery),
                 joinedload(Order.ordered_products)
                 .joinedload(OrderedProduct.product)
             )
@@ -67,6 +69,9 @@ class OrderRepository:
             order_data = {
                 "order_id": order.id,
                 "member_id": order.member_id,
+                "address": order.delivery.address,
+                "order_status": convert_order_status(order.get_status()),
+                "delivery_status": convert_delivery_status(order.delivery.get_status()),
                 "products": []
             }
             for ordered_product in order.ordered_products:
@@ -85,6 +90,7 @@ class OrderRepository:
             select(Order)
             .where(member_id == Order.member_id)
             .options(
+                joinedload(Order.delivery),
                 joinedload(Order.ordered_products)
                 .joinedload(OrderedProduct.product)
             )
@@ -98,6 +104,9 @@ class OrderRepository:
         for order in orders_raw:
             order_data = {
                 "order_id": order.id,
+                "address": order.delivery.address,
+                "order_status": convert_order_status(order.get_status()),
+                "delivery_status": convert_delivery_status(order.delivery.get_status()),
                 "products": []
             }
             for ordered_product in order.ordered_products:
@@ -115,6 +124,9 @@ class OrderRepository:
         return self.session.scalar(
             select(Order)
             .where(order_id == Order.id)
+            .options(
+                joinedload(Order.delivery)
+            )
         )
 
     def delete_one(self, order_id: int):

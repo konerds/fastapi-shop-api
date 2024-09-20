@@ -48,13 +48,18 @@ function handlerOnChangeQuantity(e) {
 
 function createOrder() {
     var productId = document.getElementById("options-product").value;
-    var quantity = document.getElementById('quantity').value;
-    if (!productId || !quantity) {
+    var quantity = document.getElementById("quantity").value;
+    var address = document.getElementById("address").value;
+    if (!productId) {
         alert("주문하실 상품을 선택해주세요...");
         return;
     }
     if (!quantity) {
         alert("주문 수량을 입력해주세요...");
+        return;
+    }
+    if (!address) {
+        alert("배송 주소를 입력해주세요...");
         return;
     }
     fetch('/api/orders', {
@@ -65,7 +70,8 @@ function createOrder() {
         body: JSON.stringify(
             {
                 product_id: productId,
-                quantity: quantity
+                quantity: quantity,
+                address: address
             }
         )
     })

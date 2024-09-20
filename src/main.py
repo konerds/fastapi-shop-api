@@ -2,10 +2,10 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.responses import RedirectResponse
 
 from api import base, products, orders, members, admin
 from core.config import settings
@@ -32,7 +32,10 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan
+)
+
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET_KEY)
 
