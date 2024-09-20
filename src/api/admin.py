@@ -334,6 +334,6 @@ def delete_order_handler(
     if not (order_status == OrderStatus.CANCELED or (
             order_status == OrderStatus.COMPLETED and order.delivery.get_status() == DeliveryStatus.COMPLETED)):
         order.cancel()
-    order_repository.delete_one(order_id)
+    session.delete(order)
     session.commit()
     return Response()
