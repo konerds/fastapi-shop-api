@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    {% include "common/upgrade-requests.html" %}
     <title>{{ title_page }}</title>
     {% include "common/external.html" %}
     {% include "common/font.html" %}
@@ -45,13 +45,35 @@
                     onchange="handlerOnChangeQuantity(event)"
             />
             <p id="total-price" class="mt-3"></p>
+            <input
+                    type="text"
+                    id="address"
+                    class="form-control address"
+                    placeholder="배송 주소"
+            />
             <button onclick="createOrder()" class="btn btn-primary btn-block">주문하기</button>
         </div>
     </div>
     {% for order in orders %}
         <div class="card order">
             <h2>주문 번호: {{ order.order_id }}</h2>
+            <h3>배송 주소: {{ order.address }} </h3>
             <div class="card-body">
+                <input
+                        type="text"
+                        id="order-status-{{ order.id }}"
+                        class="form-control"
+                        value="주문 상태: {{ order.order_status }}"
+                        readonly
+                />
+                <input
+                        type="text"
+                        id="delivery-status-{{ order.id }}"
+                        class="form-control"
+                        value="배송 상태: {{ order.delivery_status }}"
+                        readonly
+                />
+                <hr/>
                 {% for product in order.products %}
                     <input
                             type="text"

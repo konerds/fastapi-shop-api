@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
+from core.config import settings
 from db.models import Order, OrderedProduct
 from db.repositories import OrderRepository, MemberRepository, ProductRepository
 from dependencies import get_db, TEMPLATE_DIR
@@ -11,6 +12,7 @@ from schema.res import DtoResOrders, DtoResOrder, DtoResOrderedProduct
 
 router = APIRouter()
 templates = Jinja2Templates(directory=TEMPLATE_DIR)
+templates.env.globals['env'] = settings.ENV
 
 
 @router.get(
@@ -31,6 +33,7 @@ def get_orders_handler(
     member_repository = MemberRepository(session)
     member = member_repository.get_one(member_id)
     if member is None:
+        request.session.pop("member_id", None)
         return RedirectResponse("/signin")
     if member.is_admin is True:
         return RedirectResponse("/")
@@ -88,11 +91,13 @@ def post_order_handler(
     order = order_repository.save(
         Order.create(
             member=member,
-            ordered_products=[ordered_product]
+            ordered_products=[ordered_product],
+            address=req_body.address
         )
     )
     return DtoResOrder(
         id=order.id,
+        address=order.delivery.address,
         products=[DtoResOrderedProduct(
             id=product.id,
             name=product.name,
