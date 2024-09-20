@@ -152,10 +152,10 @@ class OrderStatus(Enum):
 
 
 class DeliveryStatus(Enum):
+    PENDING = "pending"
     PROCEEDING = "proceeding"
     COMPLETED = "completed"
     CANCELED = "canceled"
-    PENDING = "pending"
 
 
 class Delivery(Base, MixinDefault):
@@ -249,6 +249,7 @@ class Order(Base, MixinDefault):
         for ordered_product in self.ordered_products:
             ordered_product.cancel()
         self.set_status(OrderStatus.CANCELED)
+        self.delivery.set_status(DeliveryStatus.CANCELED)
 
     @classmethod
     def create(cls, member: Member, ordered_products: list[OrderedProduct], address: str):

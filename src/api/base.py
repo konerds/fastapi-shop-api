@@ -26,7 +26,7 @@ def get_root_page_handler(
     if member is None:
         request.session.pop("member_id", None)
         return RedirectResponse("/signin")
-    if member.is_admin is True:
+    if member.is_admin:
         return RedirectResponse("/admin/products")
     return RedirectResponse("/orders")
 

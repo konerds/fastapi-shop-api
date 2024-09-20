@@ -105,10 +105,12 @@
                             readonly
                     />
                 {% endfor %}
-                <div class="edit-buttons">
-                    <button onclick="cancelOrder({{ order.order_id }})" class="btn btn-delete"><i
-                            class="fas fa-trash-alt"></i></button>
-                </div>
+                {% if order.order_status == "주문 진행" %}
+                    <div class="edit-buttons">
+                        <button onclick="cancelOrder({{ order.order_id }})" class="btn btn-delete"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endfor %}

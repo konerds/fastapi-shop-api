@@ -78,11 +78,11 @@ function createOrder() {
         });
 }
 
-function cancelOrder(orderId) {
-    if (!confirm('주문을 취소하시겠습니까?')) {
+function deleteOrder(orderId) {
+    if (!confirm('주문을 삭제하시겠습니까? (주문 이력 삭제는 권장되지 않습니다)')) {
         return;
     }
-    fetch('/api/orders/' + orderId, {
+    fetch('/api/admin/orders/' + orderId, {
         method: 'DELETE',
     })
         .catch((error) => {

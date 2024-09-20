@@ -38,19 +38,19 @@ TEMPLATE_DIR = os.path.join(SOURCE_DIR, "templates")
 
 def convert_order_status(status: OrderStatus):
     if status == OrderStatus.PROCEEDING:
-        return "진행"
+        return "주문 진행"
     if status == OrderStatus.COMPLETED:
-        return "완료"
+        return "결제 완료"
     if status == OrderStatus.CANCELED:
-        return "취소"
+        return "주문 취소"
 
 
 def convert_delivery_status(status: DeliveryStatus):
     if status == DeliveryStatus.PENDING:
-        return "대기"
+        return "배송 대기"
     if status == DeliveryStatus.PROCEEDING:
-        return "진행"
+        return "배송 진행"
     if status == DeliveryStatus.COMPLETED:
-        return "완료"
+        return "배송 완료"
     if status == DeliveryStatus.CANCELED:
         return "취소"
