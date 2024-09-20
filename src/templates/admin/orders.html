@@ -78,6 +78,10 @@
                             readonly
                     />
                 {% endfor %}
+                <div class="edit-buttons">
+                    <button onclick="deleteOrder({{ order.order_id }})" class="btn btn-delete"><i
+                            class="fas fa-trash-alt"></i></button>
+                </div>
             </div>
         </div>
     {% endfor %}

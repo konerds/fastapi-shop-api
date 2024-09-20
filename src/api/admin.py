@@ -1,4 +1,4 @@
-from fastapi import status, Query, Request, APIRouter, Depends, HTTPException
+from fastapi import status, Query, Request, APIRouter, Depends, HTTPException, Response
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -41,7 +41,7 @@ def get_admin_products_page_handler(
     if member is None:
         request.session.pop("member_id", None)
         return RedirectResponse("/signin")
-    if member.is_admin is False:
+    if not member.is_admin:
         return RedirectResponse("/")
     product_repository = ProductRepository(session)
     products = product_repository.get_all(sort_type == "desc")
@@ -115,7 +115,7 @@ def post_product_handler(
             status_code=404,
             detail="존재하지 않는 회원입니다..."
         )
-    if member.is_admin is False:
+    if not member.is_admin:
         raise HTTPException(
             status_code=401,
             detail="인가되지 않은 요청입니다..."
@@ -161,7 +161,7 @@ def put_product_handler(
             status_code=404,
             detail="존재하지 않는 회원입니다..."
         )
-    if member.is_admin is False:
+    if not member.is_admin:
         raise HTTPException(
             status_code=401,
             detail="인가되지 않은 요청입니다..."
@@ -173,7 +173,7 @@ def put_product_handler(
             status_code=404,
             detail="존재하지 않는 상품입니다..."
         )
-    if product_repository.get_one_by_name(req_body.name).id is not product.id:
+    if product_repository.get_one_by_name(req_body.name).id != product.id:
         raise HTTPException(
             status_code=400,
             detail="이미 존재하는 상품입니다..."
@@ -210,12 +210,24 @@ def put_order_status_handler(
             status_code=404,
             detail="존재하지 않는 회원입니다..."
         )
+    if not member.is_admin:
+        raise HTTPException(
+            status_code=401,
+            detail="인가되지 않은 요청입니다..."
+        )
     order_repository = OrderRepository(session)
     order = order_repository.get_one(order_id)
-    status = OrderStatus(req_body.status)
-    order.set_status(status)
-    if status == OrderStatus.CANCELED:
-        order.delivery.set_status(DeliveryStatus.CANCELED)
+    order_status = order.get_status()
+    if order_status == OrderStatus.CANCELED:
+        raise HTTPException(
+            status_code=400,
+            detail="취소된 주문은 변경할 수 없습니다..."
+        )
+    order_status = OrderStatus(req_body.status)
+    if order_status == OrderStatus.CANCELED:
+        order.cancel()
+    else:
+        order.set_status(order_status)
     order = order_repository.save(order)
     return {
         "id": order.id,
@@ -246,12 +258,59 @@ def put_order_delivery_status_handler(
             status_code=404,
             detail="존재하지 않는 회원입니다..."
         )
+    if not member.is_admin:
+        raise HTTPException(
+            status_code=401,
+            detail="인가되지 않은 요청입니다..."
+        )
     order_repository = OrderRepository(session)
     order = order_repository.get_one(order_id)
-    order.delivery.set_status(DeliveryStatus(req_body.status))
+    delivery_status = order.delivery.get_status()
+    if delivery_status == DeliveryStatus.CANCELED:
+        raise HTTPException(
+            status_code=400,
+            detail="취소된 주문의 배송 상태는 변경할 수 없습니다..."
+        )
+    delivery_status = DeliveryStatus(req_body.status)
+    order.delivery.set_status(delivery_status)
     order = order_repository.save(order)
     return {
         "id": order.id,
         "order_status": order.get_status().value,
         "delivery_status": order.delivery.get_status().value
     }
+
+
+@router.delete(
+    "/api/admin/orders/{order_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_order_handler(
+        request: Request,
+        order_id: int,
+        session: Session = Depends(get_db)
+):
+    member_id = request.session.get("member_id")
+    if member_id is None:
+        raise HTTPException(
+            status_code=401,
+            detail="인가되지 않은 요청입니다..."
+        )
+    member_repository = MemberRepository(session)
+    member = member_repository.get_one(member_id)
+    if member is None:
+        raise HTTPException(
+            status_code=404,
+            detail="존재하지 않는 회원입니다..."
+        )
+    if not member.is_admin:
+        raise HTTPException(
+            status_code=401,
+            detail="인가되지 않은 요청입니다..."
+        )
+    order_repository = OrderRepository(session)
+    order = order_repository.get_one(order_id)
+    order.cancel()
+    order_repository.delete_one(order_id)
+    session.commit()
+    return Response()

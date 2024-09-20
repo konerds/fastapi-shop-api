@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from core.config import settings
-from db.models import Order, OrderedProduct
+from db.models import Order, OrderedProduct, OrderStatus
 from db.repositories import OrderRepository, MemberRepository, ProductRepository
 from dependencies import get_db, TEMPLATE_DIR
 from schema.req import DtoReqPostOrder
@@ -35,7 +35,7 @@ def get_orders_handler(
     if member is None:
         request.session.pop("member_id", None)
         return RedirectResponse("/signin")
-    if member.is_admin is True:
+    if member.is_admin:
         return RedirectResponse("/")
     product_repository = ProductRepository(session)
     products = product_repository.get_all(sort_type == "desc")
@@ -131,7 +131,12 @@ def delete_order_handler(
         )
     order_repository = OrderRepository(session)
     order = order_repository.get_one(order_id)
+    order_status = order.get_status()
+    if order_status != OrderStatus.PROCEEDING:
+        raise HTTPException(
+            status_code=400,
+            detail="진행중인 주문만 취소할 수 있습니다..."
+        )
     order.cancel()
-    order_repository.delete_one(order_id)
     session.commit()
     return Response()
