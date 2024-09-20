@@ -1,3 +1,5 @@
+import os
+
 from passlib.context import CryptContext
 from sqlalchemy import text
 
@@ -26,3 +28,8 @@ def get_db():
         yield session
     finally:
         session.close()
+
+
+SOURCE_DIR = os.path.dirname(__file__)
+STATIC_DIR = os.path.join(SOURCE_DIR, "static")
+TEMPLATE_DIR = os.path.join(SOURCE_DIR, "templates")

@@ -4,12 +4,12 @@ from sqlalchemy.orm import Session
 
 from db.models import Member
 from db.repositories import MemberRepository
-from dependencies import get_db, encrypt, verify
+from dependencies import get_db, encrypt, verify, TEMPLATE_DIR
 from schema.req import DtoReqPostMember, DtoReqSigninMember
 from schema.res import DtoResMembers, DtoResMember
 
 router = APIRouter(prefix="/api/members")
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=TEMPLATE_DIR)
 
 
 @router.get(

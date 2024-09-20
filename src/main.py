@@ -1,4 +1,3 @@
-import os
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -12,7 +11,7 @@ from api import base, products, orders, members, admin
 from core.config import settings
 from db.models import Member
 from db.repositories import MemberRepository
-from dependencies import get_db, encrypt
+from dependencies import get_db, encrypt, STATIC_DIR
 
 
 @asynccontextmanager
@@ -34,7 +33,6 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-STATIC_DIR = os.path.join(os.path.join(os.path.dirname(__file__), "static"))
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET_KEY)
 
