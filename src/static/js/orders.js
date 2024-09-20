@@ -20,7 +20,7 @@ function handlerOnChangeOptions(e) {
     elInputQuantity.setAttribute("max", stock);
     elInputQuantity.setAttribute("value", 1)
     elInputQuantity.style.display = "block";
-    elParagraphTotalPrice.innerText = `총 주문 가격: ${price}원`;
+    elParagraphTotalPrice.innerText = `총 주문 가격: ${price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원`;
 }
 
 function handlerOnChangeQuantity(e) {
@@ -43,7 +43,7 @@ function handlerOnChangeQuantity(e) {
         }
     }
     document.getElementById("quantity").value = quantity;
-    document.getElementById("total-price").innerText = `총 주문 가격: ${price * quantity}원`;
+    document.getElementById("total-price").innerText = `총 주문 가격: ${(price * quantity).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원`;
 }
 
 function createOrder() {
@@ -76,12 +76,8 @@ function createOrder() {
         )
     })
         .then(response => response.json())
-        .then(_ => {
-            location.reload();
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+        .then(_ => location.reload())
+        .catch((error) => console.error('Error:', error));
 }
 
 function cancelOrder(orderId) {
@@ -91,9 +87,5 @@ function cancelOrder(orderId) {
     fetch('/api/orders/' + orderId, {
         method: 'DELETE',
     })
-        .catch((error) => {
-            console.error('Error:', error);
-        }).finally(() => {
-        location.reload();
-    });
+        .catch((error) => console.error('Error:', error)).finally(() => location.reload());
 }

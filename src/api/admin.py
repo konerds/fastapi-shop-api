@@ -223,16 +223,25 @@ def put_order_status_handler(
             status_code=400,
             detail="취소된 주문은 변경할 수 없습니다..."
         )
+    delivery_status = order.delivery.get_status()
+    if order_status == OrderStatus.COMPLETED and delivery_status == DeliveryStatus.COMPLETED:
+        raise HTTPException(
+            status_code=400,
+            detail="결제 및 배송이 완료된 주문은 변경할 수 없습니다..."
+        )
     order_status = OrderStatus(req_body.status)
     if order_status == OrderStatus.CANCELED:
         order.cancel()
     else:
         order.set_status(order_status)
+        if order_status == OrderStatus.PROCEEDING:
+            delivery_status = DeliveryStatus.PENDING
+            order.delivery.set_status(delivery_status)
     order = order_repository.save(order)
     return {
         "id": order.id,
-        "order_status": order.get_status().value,
-        "delivery_status": order.delivery.get_status().value
+        "order_status": order_status.value,
+        "delivery_status": delivery_status.value
     }
 
 
@@ -265,19 +274,30 @@ def put_order_delivery_status_handler(
         )
     order_repository = OrderRepository(session)
     order = order_repository.get_one(order_id)
+    order_status = order.get_status()
+    if order_status != OrderStatus.COMPLETED:
+        raise HTTPException(
+            status_code=400,
+            detail="결제가 완료된 주문의 배송 상태만 변경할 수 있습니다..."
+        )
     delivery_status = order.delivery.get_status()
     if delivery_status == DeliveryStatus.CANCELED:
         raise HTTPException(
             status_code=400,
             detail="취소된 주문의 배송 상태는 변경할 수 없습니다..."
         )
+    if order_status == OrderStatus.COMPLETED and delivery_status == DeliveryStatus.COMPLETED:
+        raise HTTPException(
+            status_code=400,
+            detail="결제 및 배송이 완료된 주문은 변경할 수 없습니다..."
+        )
     delivery_status = DeliveryStatus(req_body.status)
     order.delivery.set_status(delivery_status)
     order = order_repository.save(order)
     return {
         "id": order.id,
-        "order_status": order.get_status().value,
-        "delivery_status": order.delivery.get_status().value
+        "order_status": order_status.value,
+        "delivery_status": delivery_status.value
     }
 
 
@@ -310,7 +330,10 @@ def delete_order_handler(
         )
     order_repository = OrderRepository(session)
     order = order_repository.get_one(order_id)
-    order.cancel()
+    order_status = order.get_status()
+    if not (order_status == OrderStatus.CANCELED or (
+            order_status == OrderStatus.COMPLETED and order.delivery.get_status() == DeliveryStatus.COMPLETED)):
+        order.cancel()
     order_repository.delete_one(order_id)
     session.commit()
     return Response()

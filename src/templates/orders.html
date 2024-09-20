@@ -86,14 +86,14 @@
                             type="text"
                             id="unit-price-{{ product.id }}"
                             class="form-control"
-                            value="상품 가격: {{ product.price }}원"
+                            value="상품 가격: {{ "{:,d}원".format(product.price) }}"
                             readonly
                     />
                     <input
                             type="text"
                             id="quantity-{{ product.id }}"
                             class="form-control"
-                            value="주문 수량: {{ product.quantity }}개"
+                            value="주문 수량: {{ "{:,d}개".format(product.quantity) }}"
                             readonly
                     />
                     <hr/>
@@ -101,14 +101,27 @@
                             type="text"
                             id="total-price-{{ product.id }}"
                             class="form-control"
-                            value="총 주문 금액: {{ product.price * product.quantity }}원"
+                            value="총 주문 금액: {{ "{:,d}원".format(product.price * product.quantity) }}"
                             readonly
                     />
                 {% endfor %}
-                {% if order.order_status == "주문 진행" %}
+                {% if not
+                      (
+                          order.order_status == "주문 취소"
+                          or
+                          (
+                              order.order_status == "결제 완료"
+                              and
+                              order.delivery_status == "배송 완료"
+                          )
+                      ) %}
                     <div class="edit-buttons">
-                        <button onclick="cancelOrder({{ order.order_id }})" class="btn btn-delete"><i
-                                class="fas fa-trash-alt"></i></button>
+                        <button
+                                onclick="cancelOrder({{ order.order_id }})"
+                                class="btn btn-cancel"
+                        >
+                            <i class="fas fa-ban"></i>&nbsp;&nbsp;주문 취소
+                        </button>
                     </div>
                 {% endif %}
             </div>

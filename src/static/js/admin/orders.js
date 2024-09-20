@@ -1,93 +1,61 @@
-function handlerOnChangeOptions(e) {
-    var elSelectProducts = e.target;
-    var selectedIdx = elSelectProducts.selectedIndex;
-    var elInputQuantity = document.getElementById("quantity");
-    var elParagraphTotalPrice = document.getElementById("total-price");
-    if (!selectedIdx) {
-        elInputQuantity.style.display = "none";
-        elParagraphTotalPrice.innerText = '';
+function putOrderStatus(orderId, status) {
+    if (!confirm(`주문 상태를 ${status === "proceeding" ? "주문 진행" : status === "completed" ? "결제 완료" : "취소"} 처리하시겠습니까?`)) {
         return;
     }
-    var pdt = elSelectProducts.options[selectedIdx];
-    var price = pdt.getAttribute("data-price");
-    if (+price < 0) {
-        return;
-    }
-    var stock = pdt.getAttribute("data-stock");
-    if (!stock) {
-        return;
-    }
-    elInputQuantity.setAttribute("max", stock);
-    elInputQuantity.setAttribute("value", 1)
-    elInputQuantity.style.display = "block";
-    elParagraphTotalPrice.innerText = `총 주문 가격: ${price}원`;
-}
-
-function handlerOnChangeQuantity(e) {
-    var elSelectProducts = document.getElementById("options-product");
-    var selectedIdx = elSelectProducts.selectedIndex;
-    if (!selectedIdx) {
-        return;
-    }
-    var price = elSelectProducts.options[selectedIdx].getAttribute("data-price");
-    if (+price < 0) {
-        return;
-    }
-    var quantity = +e.target.value;
-    if (!quantity) {
-        quantity = 1;
-    } else {
-        var max = +e.target.max;
-        if (quantity > max) {
-            quantity = max;
-        }
-    }
-    document.getElementById("quantity").value = quantity;
-    document.getElementById("total-price").innerText = `총 주문 가격: ${price * quantity}원`;
-}
-
-function createOrder() {
-    var productId = document.getElementById("options-product").value;
-    var quantity = document.getElementById('quantity').value;
-    if (!productId || !quantity) {
-        alert("주문하실 상품을 선택해주세요...");
-        return;
-    }
-    if (!quantity) {
-        alert("주문 수량을 입력해주세요...");
-        return;
-    }
-    fetch('/api/orders', {
-        method: 'POST',
+    fetch(`/api/admin/orders/${orderId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(
-            {
-                product_id: productId,
-                quantity: quantity
-            }
-        )
+        body: JSON.stringify({
+            status
+        })
     })
-        .then(response => response.json())
-        .then(_ => {
-            location.reload();
+        .then(async (response) => {
+            if (!response.ok) {
+                throw new Error((await response.json()).detail || "주문 상태 변경에 실패하였습니다...");
+            }
+            return response.json();
         })
         .catch((error) => {
+            alert(error.message);
             console.error('Error:', error);
-        });
+        })
+        .finally(() => location.reload());
+}
+
+function putOrderDeliveryStatus(orderId, status) {
+    if (!confirm(`배송 상태를 ${status === "pending" ? "배송 대기" : status === "proceeding" ? "배송 진행" : status === "completed" ? "배송 완료" : "취소"} 처리하시겠습니까?`)) {
+        return;
+    }
+    fetch(`/api/admin/orders/${orderId}/delivery`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            status
+        })
+    })
+        .then(async (response) => {
+            if (!response.ok) {
+                throw new Error((await response.json()).detail || "배송 상태 변경에 실패하였습니다...");
+            }
+            return response.json();
+        })
+        .catch((error) => {
+            alert(error.message);
+            console.error('Error:', error);
+        })
+        .finally(() => location.reload());
 }
 
 function deleteOrder(orderId) {
     if (!confirm('주문을 삭제하시겠습니까? (주문 이력 삭제는 권장되지 않습니다)')) {
         return;
     }
-    fetch('/api/admin/orders/' + orderId, {
+    fetch(`/api/admin/orders/${orderId}`, {
         method: 'DELETE',
     })
-        .catch((error) => {
-            console.error('Error:', error);
-        }).finally(() => {
-        location.reload();
-    });
+        .catch((error) => console.error('Error:', error)).finally(() => location.reload());
 }
