@@ -59,14 +59,14 @@
                             type="text"
                             id="unit-price-{{ product.id }}"
                             class="form-control"
-                            value="상품 가격: {{ product.price }}원"
+                            value="상품 가격: {{ "{:,d}원".format(product.price) }}"
                             readonly
                     />
                     <input
                             type="text"
                             id="quantity-{{ product.id }}"
                             class="form-control"
-                            value="주문 수량: {{ product.quantity }}개"
+                            value="주문 수량: {{ "{:,d}개".format(product.quantity) }}"
                             readonly
                     />
                     <hr/>
@@ -74,13 +74,66 @@
                             type="text"
                             id="total-price-{{ product.id }}"
                             class="form-control"
-                            value="총 주문 금액: {{ product.price * product.quantity }}원"
+                            value="총 주문 금액: {{ "{:,d}원".format(product.price * product.quantity) }}"
                             readonly
                     />
                 {% endfor %}
                 <div class="edit-buttons">
-                    <button onclick="deleteOrder({{ order.order_id }})" class="btn btn-delete"><i
-                            class="fas fa-trash-alt"></i></button>
+                    {% if not
+                          (
+                              order.order_status == "주문 취소"
+                              or
+                              (
+                                  order.order_status == "결제 완료"
+                                  and
+                                  order.delivery_status == "배송 완료"
+                              )
+                          ) %}
+                        <button
+                                class="btn btn-confirm"
+                                onclick="putOrderStatus({{ order.order_id }}, 'canceled')"
+                        >
+                            <i class="fas fa-ban"></i>&nbsp;&nbsp;주문 취소
+                        </button>
+                        <button
+                                class="btn btn-confirm"
+                                onclick="putOrderStatus({{ order.order_id }}, 'proceeding')"
+                        >
+                            <i class="fas fa-play-circle"></i>&nbsp;&nbsp;주문 진행
+                        </button>
+                        <button
+                                class="btn btn-confirm"
+                                onclick="putOrderStatus({{ order.order_id }}, 'completed')"
+                        >
+                            <i class="fas fa-check-circle"></i>&nbsp;&nbsp;결제 완료
+                        </button>
+                        <button
+                                class="btn btn-confirm"
+                                onclick="putOrderDeliveryStatus({{ order.order_id }}, 'pending')"
+                        >
+                            <i class="fas fa-pause-circle"></i>&nbsp;&nbsp;배송 대기
+                        </button>
+                        <button
+                                class="btn btn-confirm"
+                                onclick="putOrderDeliveryStatus({{ order.order_id }}, 'proceeding')"
+                        >
+                            <i class="fas fa-truck"></i>&nbsp;&nbsp;배송 진행
+                        </button>
+                        <button
+                                class="btn btn-confirm"
+                                onclick="putOrderDeliveryStatus({{ order.order_id }}, 'completed')"
+                        >
+                            <i class="fas fa-user-check"></i>&nbsp;&nbsp;배송 완료
+                        </button>
+                    {% endif %}
+                </div>
+                <div class="edit-buttons">
+                    <button
+                            class="btn btn-delete"
+                            onclick="deleteOrder({{ order.order_id }})"
+                    >
+                        <i class="fas fa-trash-alt"></i>&nbsp;&nbsp;주문 삭제
+                    </button>
                 </div>
             </div>
         </div>

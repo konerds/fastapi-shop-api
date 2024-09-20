@@ -53,6 +53,10 @@ function putProduct(id, pdt) {
 
 
 function toggleEdit(id, doNotUpdate = false) {
+    if (doNotUpdate) {
+        location.reload();
+        return;
+    }
     if (+id < 0) {
         alert("올바르지 않은 상품입니다...")
         return;

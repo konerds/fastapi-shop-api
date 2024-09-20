@@ -36,6 +36,10 @@
     padding: 16px;
 }
 
+.address {
+    padding-left: 16px;
+}
+
 .edit-buttons {
     margin: 10px 0 0 10px;
     text-align: right;
@@ -56,12 +60,12 @@
     transform: scale(1.1);
 }
 
-.edit-buttons .btn-delete {
+.edit-buttons .btn-cancel {
     background-color: #3498DB;
     color: #fff;
 }
 
-.edit-buttons .btn-delete:hover {
+.edit-buttons .btn-cancel:hover {
     background-color: #2980B9;
 }
 

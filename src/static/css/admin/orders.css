@@ -27,15 +27,6 @@
     margin-bottom: 10px;
 }
 
-.order-quantity {
-    display: none;
-    width: 100%;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    padding: 16px;
-}
-
 .edit-buttons {
     margin: 10px 0 0 10px;
     text-align: right;
@@ -57,12 +48,24 @@
 }
 
 .edit-buttons .btn-delete {
-    background-color: #3498DB;
+    background-color: darkred;
     color: #fff;
 }
 
 .edit-buttons .btn-delete:hover {
+    background-color: darkred;
+    color: #fff;
+    opacity: 0.7;
+}
+
+.edit-buttons .btn-confirm {
+    background-color: #3498DB;
+    color: #fff;
+}
+
+.edit-buttons .btn-confirm:hover {
     background-color: #2980B9;
+    color: #fff;
 }
 
 .btn-primary {
