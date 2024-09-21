@@ -51,6 +51,10 @@
     </div>
     {% for product in products %}
         <div class="card order">
+            <p>등록 일시: {{ product.created_at }}</p>
+            {% if product.updated_at %}
+                <p>수정 일시: {{ product.updated_at }}</p>
+            {% endif %}
             <div class="card-body">
                 <label for="name-{{ product.id }}">상품 이름</label>
                 <input

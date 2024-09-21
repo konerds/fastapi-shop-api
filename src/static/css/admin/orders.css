@@ -10,12 +10,25 @@
     background-color: #fff;
 }
 
-.card.order > h2 {
-    padding: 10px;
+.card.order {
+    padding-top: 10px;
 }
 
-.card.order > h3 {
-    padding-left: 10px;
+.card.order > p {
+    margin: 0 0 0 auto;
+    padding-right: 10px;
+}
+
+.card.order > h2 {
+    padding-left: 16px;
+}
+
+.card.order > h4 {
+    padding-left: 40px;
+}
+
+.card.order > h5 {
+    padding-left: 56px;
 }
 
 .card-body {

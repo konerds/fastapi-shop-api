@@ -10,6 +10,15 @@
     background-color: #fff;
 }
 
+.card.order {
+    padding-top: 10px;
+}
+
+.card.order > p {
+    margin: 0 0 0 auto;
+    padding-right: 10px;
+}
+
 .card-body {
     position: relative;
     padding: 10px;

@@ -95,7 +95,6 @@ function cancelOrder(orderId) {
         method: 'DELETE',
     })
         .then(response => {
-            console.log(response.status);
             if (response.status === 204) {
                 return location.reload();
             }

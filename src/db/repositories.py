@@ -27,16 +27,16 @@ class ProductRepository:
             )
         )
 
-    def get_one(self, product_id):
+    def get_one(self, product_id: int):
         return self.session.scalar(
             select(Product)
-            .where(product_id == Product.id)
+            .where(Product.id == product_id)
         )
 
-    def get_one_by_name(self, name):
+    def get_one_by_name(self, name: str):
         return self.session.scalar(
             select(Product)
-            .where(name == Product.name)
+            .where(Product.name == name)
         )
 
 
@@ -67,10 +67,14 @@ class OrderRepository:
         orders = []
         for order in orders_raw:
             order_data = {
+                "created_at": order.created_at,
+                "updated_at": order.updated_at,
                 "order_id": order.id,
                 "member_id": order.member_id,
                 "address": order.delivery.address,
                 "order_status": convert_order_status(order.get_status()),
+                "delivery_created_at": order.delivery.created_at,
+                "delivery_updated_at": order.delivery.updated_at,
                 "delivery_status": convert_delivery_status(order.delivery.get_status()),
                 "products": []
             }
@@ -79,16 +83,16 @@ class OrderRepository:
                 product_data = {
                     "quantity": ordered_product.quantity,
                     "name": product.name,
-                    "price": product.price
+                    "price": ordered_product.price
                 }
                 order_data["products"].append(product_data)
             orders.append(order_data)
         return orders
 
-    def get_all_by_member_id(self, member_id, is_desc: bool = True):
+    def get_all_by_member_id(self, member_id: int, is_desc: bool = True):
         orders_raw = self.session.execute(
             select(Order)
-            .where(member_id == Order.member_id)
+            .where(Order.member_id == member_id)
             .options(
                 joinedload(Order.delivery),
                 joinedload(Order.ordered_products)
@@ -103,9 +107,13 @@ class OrderRepository:
         orders = []
         for order in orders_raw:
             order_data = {
+                "created_at": order.created_at,
+                "updated_at": order.updated_at,
                 "order_id": order.id,
                 "address": order.delivery.address,
                 "order_status": convert_order_status(order.get_status()),
+                "delivery_created_at": order.delivery.created_at,
+                "delivery_updated_at": order.delivery.updated_at,
                 "delivery_status": convert_delivery_status(order.delivery.get_status()),
                 "products": []
             }
@@ -114,16 +122,16 @@ class OrderRepository:
                 product_data = {
                     "quantity": ordered_product.quantity,
                     "name": product.name,
-                    "price": product.price
+                    "price": ordered_product.price
                 }
                 order_data["products"].append(product_data)
             orders.append(order_data)
         return orders
 
-    def get_one(self, order_id):
+    def get_one(self, order_id: int):
         return self.session.scalar(
             select(Order)
-            .where(order_id == Order.id)
+            .where(Order.id == order_id)
             .options(
                 joinedload(Order.delivery)
             )
@@ -132,7 +140,7 @@ class OrderRepository:
     def delete_one(self, order_id: int):
         self.session.execute(
             delete(Order)
-            .where(order_id == Order.id)
+            .where(Order.id == order_id)
         )
 
 
@@ -158,14 +166,14 @@ class MemberRepository:
             )
         )
 
-    def get_one(self, member_id):
+    def get_one(self, member_id: int):
         return self.session.scalar(
             select(Member)
-            .where(member_id == Member.id)
+            .where(Member.id == member_id)
         )
 
-    def get_one_by_email(self, email):
+    def get_one_by_email(self, email: str):
         return self.session.scalar(
             select(Member)
-            .where(email == Member.email)
+            .where(Member.email == email)
         )

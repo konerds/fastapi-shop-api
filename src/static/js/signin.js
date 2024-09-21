@@ -13,16 +13,14 @@ function submitSigninForm(event) {
         body: JSON.stringify(data)
     })
         .then(response => {
-            if (response.status === 201) {
-                alert("로그인에 성공하였습니다!");
-                location.href = '/';
-                return;
+            if (response.status !== 201) {
+                throw new Error("로그인에 실패하였습니다...");
             }
-            return response.json().then(dataRaw => {
-                throw new Error(dataRaw.detail || '로그인에 실패하였습니다...');
-            })
+            alert("로그인에 성공하였습니다!");
+            location.href = '/';
         })
-        .catch((error) => {
+        .catch(error => {
+            alert(error.message);
             console.error('Error:', error);
         });
 }
