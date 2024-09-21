@@ -19,16 +19,13 @@
     padding-right: 10px;
 }
 
-.card.order > h2 {
+.card.order > h2,
+.card.order > h4 {
     padding-left: 16px;
 }
 
-.card.order > h4 {
-    padding-left: 40px;
-}
-
 .card.order > h5 {
-    padding-left: 56px;
+    padding-left: 32px;
 }
 
 .card-body {
@@ -38,6 +35,11 @@
 
 .card-body > *:not(:last-child) {
     margin-bottom: 10px;
+}
+
+.total-price {
+    text-align: right;
+    font-size: large;
 }
 
 .edit-buttons {
