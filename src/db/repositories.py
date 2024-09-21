@@ -54,6 +54,7 @@ class OrderRepository:
         orders_raw = self.session.execute(
             select(Order)
             .options(
+                joinedload(Order.member),
                 joinedload(Order.delivery),
                 joinedload(Order.ordered_products)
                 .joinedload(OrderedProduct.product)
@@ -71,6 +72,7 @@ class OrderRepository:
                 "updated_at": order.updated_at,
                 "order_id": order.id,
                 "member_id": order.member_id,
+                "member_name": order.member.name,
                 "address": order.delivery.address,
                 "order_status": convert_order_status(order.get_status()),
                 "delivery_created_at": order.delivery.created_at,
