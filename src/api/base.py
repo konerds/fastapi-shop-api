@@ -39,8 +39,8 @@ def get_signin_page_handler(request: Request):
     return templates.TemplateResponse(
         "signin.html",
         {
-            "title_page": "Shop Service - Sign In",
-            "request": request
+            "request": request,
+            "title_page": "Shop Service - Sign In"
         }
     )
 
@@ -53,8 +53,8 @@ def get_signup_page_handler(request: Request):
     return templates.TemplateResponse(
         "signup.html",
         {
-            "title_page": "Shop Service - Sign Up",
-            "request": request
+            "request": request,
+            "title_page": "Shop Service - Sign Up"
         }
     )
 

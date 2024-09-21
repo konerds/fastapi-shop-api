@@ -11,17 +11,16 @@ function putOrderStatus(orderId, status) {
             status
         })
     })
-        .then(async (response) => {
+        .then(response => response.json().then(dataRaw => {
             if (!response.ok) {
-                throw new Error((await response.json()).detail || "주문 상태 변경에 실패하였습니다...");
+                throw new Error(dataRaw.detail || "주문 상태 변경에 실패하였습니다...");
             }
-            return response.json();
-        })
+            location.reload();
+        }))
         .catch((error) => {
             alert(error.message);
             console.error('Error:', error);
-        })
-        .finally(() => location.reload());
+        });
 }
 
 function putOrderDeliveryStatus(orderId, status) {
@@ -37,25 +36,35 @@ function putOrderDeliveryStatus(orderId, status) {
             status
         })
     })
-        .then(async (response) => {
+        .then(response => response.json().then(dataRaw => {
             if (!response.ok) {
-                throw new Error((await response.json()).detail || "배송 상태 변경에 실패하였습니다...");
+                throw new Error(dataRaw.detail || "배송 상태 변경에 실패하였습니다...");
             }
-            return response.json();
-        })
+            location.reload();
+        }))
         .catch((error) => {
             alert(error.message);
             console.error('Error:', error);
-        })
-        .finally(() => location.reload());
+        });
 }
 
 function deleteOrder(orderId) {
-    if (!confirm('주문을 삭제하시겠습니까? (주문 이력 삭제는 권장되지 않습니다)')) {
+    if (!confirm('주문 이력을 삭제하시겠습니까? (권장되지 않습니다)')) {
         return;
     }
     fetch(`/api/admin/orders/${orderId}`, {
         method: 'DELETE',
     })
-        .catch((error) => console.error('Error:', error)).finally(() => location.reload());
+        .then(response => {
+            if (response.status === 204) {
+                return location.reload();
+            }
+            return response.json().then(dataRaw => {
+                throw new Error(dataRaw.detail || "주문 이력 삭제에 실패하였습니다...");
+            });
+        })
+        .catch((error) => {
+            alert(error.message);
+            console.error('Error:', error);
+        });
 }

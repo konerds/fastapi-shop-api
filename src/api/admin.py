@@ -48,10 +48,10 @@ def get_admin_products_page_handler(
     return templates.TemplateResponse(
         "admin/products.html",
         {
+            "request": request,
             "type_page": "products",
             "title_page": "Shop Admin Service - Products",
             "title_header": "관리자 페이지 - 상품 관리",
-            "request": request,
             "products": products
         }
     )
@@ -83,10 +83,10 @@ def get_admin_orders_page_handler(
     return templates.TemplateResponse(
         "admin/orders.html",
         {
+            "request": request,
             "type_page": "orders",
             "title_page": "Shop Admin Service - Orders",
             "title_header": "관리자 페이지 - 주문 관리",
-            "request": request,
             "orders": orders
         }
     )
@@ -333,7 +333,10 @@ def delete_order_handler(
     order_status = order.get_status()
     if not (order_status == OrderStatus.CANCELED or (
             order_status == OrderStatus.COMPLETED and order.delivery.get_status() == DeliveryStatus.COMPLETED)):
-        order.cancel()
+        raise HTTPException(
+            status_code=400,
+            detail="취소 또는 결제 및 배송 완료된 주문에 대해서만 주문 이력을 삭제할 수 있습니다..."
+        )
     session.delete(order)
     session.commit()
-    return Response()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

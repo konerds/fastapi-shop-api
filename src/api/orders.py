@@ -47,9 +47,9 @@ def get_orders_handler(
     return templates.TemplateResponse(
         "orders.html",
         {
+            "request": request,
             "title_page": "Shop Service - Orders",
             "title_header": "나의 주문 목록",
-            "request": request,
             "products": products,
             "orders": orders
         }
@@ -135,8 +135,8 @@ def delete_order_handler(
     if order_status != OrderStatus.PROCEEDING:
         raise HTTPException(
             status_code=400,
-            detail="진행중인 주문만 취소할 수 있습니다..."
+            detail="결제가 완료되지 않은 주문만 취소할 수 있습니다..."
         )
     order.cancel()
     session.commit()
-    return Response()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
