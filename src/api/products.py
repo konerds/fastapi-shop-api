@@ -1,18 +1,14 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from core.config import settings
 from db.models import Product
 from db.repositories import ProductRepository
-from dependencies import get_db, TEMPLATE_DIR
+from dependencies import get_db
 from schema.res import DtoResProducts, DtoResProduct
 
 router = APIRouter(prefix="/api/products")
-templates = Jinja2Templates(directory=TEMPLATE_DIR)
-templates.env.globals['env'] = settings.ENV
 
 
 @router.get(

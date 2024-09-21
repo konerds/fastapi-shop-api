@@ -1,5 +1,6 @@
 import os
 
+from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from sqlalchemy import text
 
@@ -34,6 +35,25 @@ def get_db():
 SOURCE_DIR = os.path.dirname(__file__)
 STATIC_DIR = os.path.join(SOURCE_DIR, "static")
 TEMPLATE_DIR = os.path.join(SOURCE_DIR, "templates")
+
+templates = Jinja2Templates(directory=TEMPLATE_DIR)
+templates.env.globals['env'] = settings.ENV
+
+
+def format_datetime(ts):
+    ds = ['월', '화', '수', '목', '금', '토', '일']
+    d = ds[ts.weekday()]
+    return ts.strftime(
+        "%Y년 %m월 %d일 ({}) %H:%M:%S"
+        .format(d)
+        .encode('unicode-escape')
+        .decode()
+    ).encode().decode(
+        'unicode-escape'
+    )
+
+
+templates.env.filters["convert_datetime"] = format_datetime
 
 
 def convert_order_status(status: OrderStatus):
