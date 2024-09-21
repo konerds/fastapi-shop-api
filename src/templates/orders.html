@@ -56,13 +56,13 @@
     </div>
     {% for order in orders %}
         <div class="card order">
-            <p>주문 상태: {{ order.order_status }} ({{ order.updated_at or order.created_at }})</p>
+            <p>주문 상태: {{ order.order_status }} ({{ order.updated_at or order.created_at | convert_datetime() }})</p>
             {% if order.order_status == "주문 취소" %}
-                <p>주문 취소 일시: {{ order.updated_at }}</p>
+                <p>주문 취소 일시: {{ order.updated_at | convert_datetime() }}</p>
             {% endif %}
             <p>배송 상태: {{ order.delivery_status }}
                 {% if not (order.delivery_status == "취소" or order.delivery_status == "배송 대기") %}
-                    {{ order.delivery_updated_at }}
+                    {{ order.delivery_updated_at | convert_datetime() }}
                 {% endif %}
             </p>
             <h2>주문 번호 {{ order.order_id }}</h2>

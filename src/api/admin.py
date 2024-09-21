@@ -1,18 +1,14 @@
 from fastapi import status, Query, Request, APIRouter, Depends, HTTPException, Response
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from core.config import settings
 from db.models import Product, OrderStatus, DeliveryStatus
 from db.repositories import MemberRepository, ProductRepository, OrderRepository
-from dependencies import get_db, TEMPLATE_DIR
+from dependencies import get_db, templates
 from schema.req import DtoReqPostProduct, DtoReqPutOrderStatus, DtoReqPutDeliveryStatus
 from schema.res import DtoResProduct
 
 router = APIRouter()
-templates = Jinja2Templates(directory=TEMPLATE_DIR)
-templates.env.globals['env'] = settings.ENV
 
 
 @router.get(
