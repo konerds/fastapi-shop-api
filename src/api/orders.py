@@ -29,8 +29,6 @@ def get_orders_handler(
     member_repository = MemberRepository(session)
     member = member_repository.get_one(member_id)
     if member is None:
-        request.session.pop("member_id", None)
-        request.session.pop("member_name", None)
         return RedirectResponse("/signin")
     if member.is_admin:
         return RedirectResponse("/")
