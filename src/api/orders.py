@@ -86,7 +86,7 @@ def post_order_handler(
             status_code=400,
             detail="재고가 없습니다..."
         )
-    ordered_product = OrderedProduct.create(product, req_body.quantity)
+    ordered_product = OrderedProduct.create(product, product.price, req_body.quantity)
     order_repository = OrderRepository(session)
     order = order_repository.save(
         Order.create(
@@ -101,7 +101,7 @@ def post_order_handler(
         products=[DtoResOrderedProduct(
             id=product.id,
             name=product.name,
-            price=product.price,
+            price=ordered_product.price,
             quantity=req_body.quantity
         )]
     )

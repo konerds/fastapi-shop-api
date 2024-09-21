@@ -62,6 +62,11 @@ class Product(Base, MixinDefault):
 class OrderedProduct(Base, MixinDefault):
     __tablename__ = "ordered_products"
 
+    price = Column(
+        Integer,
+        nullable=False
+    )
+
     quantity = Column(
         Integer,
         nullable=False
@@ -91,11 +96,12 @@ class OrderedProduct(Base, MixinDefault):
         self.product.increase_stock(self.quantity)
 
     @classmethod
-    def create(cls, product: Product, quantity: int):
+    def create(cls, product: Product, price: int, quantity: int):
         product.decrease_stock(quantity)
         return cls(
             product_id=product.id,
             product=product,
+            price=price,
             quantity=quantity
         )
 

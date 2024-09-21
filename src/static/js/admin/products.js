@@ -53,8 +53,8 @@ function putProduct(id, pdt) {
         .catch((error) => {
             alert(error.message);
             console.error('Error:', error);
-            location.reload();
-        });
+        })
+        .finally(() => location.reload());
 }
 
 
