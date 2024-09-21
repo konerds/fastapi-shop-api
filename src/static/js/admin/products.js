@@ -25,9 +25,16 @@ function createProduct() {
             stock
         })
     })
-        .then(response => response.json())
-        .then(_ => location.reload())
-        .catch((error) => console.error('Error:', error));
+        .then(response => response.json().then(dataRaw => {
+            if (!response.ok) {
+                throw new Error(dataRaw.detail || "상품 생성에 실패하였습니다...");
+            }
+            location.reload();
+        }))
+        .catch((error) => {
+            alert(error.message);
+            console.error('Error:', error);
+        });
 }
 
 function putProduct(id, pdt) {
@@ -38,12 +45,11 @@ function putProduct(id, pdt) {
         },
         body: JSON.stringify(pdt)
     })
-        .then(async (response) => {
+        .then(response => response.json().then(dataRaw => {
             if (!response.ok) {
-                throw new Error((await response.json()).detail || "상품 수정에 실패하였습니다...");
+                throw new Error(dataRaw.detail || "상품 수정에 실패하였습니다...");
             }
-            return response.json();
-        })
+        }))
         .catch((error) => {
             alert(error.message);
             console.error('Error:', error);

@@ -109,11 +109,7 @@
                       (
                           order.order_status == "주문 취소"
                           or
-                          (
-                              order.order_status == "결제 완료"
-                              and
-                              order.delivery_status == "배송 완료"
-                          )
+                          order.order_status == "결제 완료"
                       ) %}
                     <div class="edit-buttons">
                         <button

@@ -13,17 +13,17 @@ function submitSignupForm(event) {
         },
         body: JSON.stringify(data)
     })
-        .then(response => response.json().then(body => ({status: response.status, body: body})))
-        .then(result => {
-            if (result.status === 201) {
-                alert(result.body.message);
+        .then(response => {
+            if (response.status === 201) {
+                alert("회원가입에 성공하였습니다!");
                 location.href = '/signin';
-            } else {
-                throw new Error(result.body.detail || '회원가입에 실패하였습니다...');
+                return;
             }
+            return response.json().then(dataRaw => {
+                throw new Error(dataRaw.detail || '회원가입에 실패하였습니다...');
+            })
         })
         .catch((error) => {
             console.error('Error:', error);
-            alert(error.message);
         });
 }

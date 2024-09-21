@@ -1,7 +1,7 @@
 <div class="header-bar">
     <div class="header-item">
         <a href="/static" class="btn btn-sm btn-danger username-button">
-            <i class="fas fa-user"></i> {{ username }}
+            <i class="fas fa-user"></i>&nbsp;&nbsp;{{ request.session.get("member_name") }}
         </a>
     </div>
     <h1>{{ title_header }}</h1>

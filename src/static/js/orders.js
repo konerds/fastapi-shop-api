@@ -75,9 +75,16 @@ function createOrder() {
             }
         )
     })
-        .then(response => response.json())
-        .then(_ => location.reload())
-        .catch((error) => console.error('Error:', error));
+        .then(response => response.json().then(dataRaw => {
+            if (!response.ok) {
+                throw new Error(dataRaw.detail || "주문 접수에 실패하였습니다...");
+            }
+            location.reload();
+        }))
+        .catch((error) => {
+            alert(error.message);
+            console.error('Error:', error);
+        });
 }
 
 function cancelOrder(orderId) {
@@ -87,5 +94,18 @@ function cancelOrder(orderId) {
     fetch('/api/orders/' + orderId, {
         method: 'DELETE',
     })
-        .catch((error) => console.error('Error:', error)).finally(() => location.reload());
+        .then(response => {
+            console.log(response.status);
+            if (response.status === 204) {
+                return location.reload();
+            }
+            return response.json().then(dataRaw => {
+                throw new Error(dataRaw.detail || "주문 취소에 실패하였습니다...");
+            });
+        })
+        .catch((error) => {
+            alert(error.message);
+            console.error('Error:', error);
+        })
+        .finally(() => location.reload());
 }

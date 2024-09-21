@@ -80,6 +80,7 @@ def signin_handler(
     member = member_repository.get_one_by_email(req_body.email)
     if member and verify(req_body.password, member.password):
         request.session["member_id"] = member.id
+        request.session["member_name"] = member.name
         return {
             "message": "로그인에 성공하였습니다!"
         }
@@ -97,6 +98,7 @@ def signout_handler(
         request: Request
 ):
     request.session.pop("member_id", None)
+    request.session.pop("member_name", None)
     return {
-        "message": "로그아웃에 성공하였습니다!"
+        "message": "로그아웃되었습니다!"
     }
