@@ -6,7 +6,8 @@ from db.models import Base
 
 if settings.ENV == "prod":
     engine = create_engine(
-        settings.DB_URL
+        settings.DB_URL,
+        pool_pre_ping=True
     )
 else:
     engine = create_engine(
