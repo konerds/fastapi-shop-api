@@ -53,5 +53,6 @@ def get_signup_page_handler(request: Request):
 
 
 @router.get("/health")
-def check_health_handler() -> DtoResHealth:
+def check_health_handler(session: Session = Depends(get_db)) -> DtoResHealth:
+    session.execute("SELECT 1")
     return DtoResHealth(status="OK")

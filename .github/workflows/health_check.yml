@@ -1,0 +1,13 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send health check request
+        run: |
+          curl -f https://fastapi-shop-api-production.up.railway.app/health || echo "Failed to request health check"
