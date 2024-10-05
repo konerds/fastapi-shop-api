@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from db.repositories import MemberRepository
@@ -54,5 +55,5 @@ def get_signup_page_handler(request: Request):
 
 @router.get("/health")
 def check_health_handler(session: Session = Depends(get_db)) -> DtoResHealth:
-    session.execute("SELECT 1")
+    session.execute(text("SELECT 1"))
     return DtoResHealth(status="OK")
